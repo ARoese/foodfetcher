@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  name     String   @unique
+  passhash String?
+  recipes  Recipe[]
+}
+
+model Recipe {
+  id           Int               @id @default(autoincrement())
+  creator      User              @relation(fields: [creatorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  creatorId    Int
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  name         String
+  instructions String
+  videoFile    String?
+  imageFile    String?
+  ingredients  IngredientEntry[]
+}
+
+model IngredientEntry {
+  id           Int              @id
+  recipes      Recipe[]
+  ingredient   Ingredient       @relation(fields: [ingredientId], references: [id])
+  ingredientId Int
+  quantifier   Quantifier       @relation(fields: [quantifierId], references: [id])
+  quantifierId Int
+  style        IngredientStyle? @relation(fields: [styleId], references: [id])
+  styleId      Int?
+  amount       Float
+}
+
+model Ingredient {
+  id              Int               @id
+  name            String            @unique
+  IngredientEntry IngredientEntry[]
+}
+
+model IngredientStyle {
+  id              Int               @id
+  style           String
+  IngredientEntry IngredientEntry[]
+}
+
+model Quantifier {
+  id              Int               @id
+  symbol          String
+  IngredientEntry IngredientEntry[]
+}

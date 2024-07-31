@@ -6,7 +6,7 @@ import Link from "next/link";
 function RecipeSmallItem({recipe}) {
     return ( 
         <Link className="m-2" href={`/recipe/${recipe.id}`}>
-            <Image className="max-h-48 max-w-48" width="auto" height="auto" src={recipeImage} alt="Recipe cover image"/>
+            <Image width="0" height="0" src={recipeImage} alt="Recipe cover image"/>
             <p className="text-center">{recipe.name}</p>
         </Link>
      );
