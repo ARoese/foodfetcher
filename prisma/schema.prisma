@@ -31,31 +31,16 @@ model Recipe {
 }
 
 model IngredientEntry {
-  id           Int              @id
-  recipes      Recipe[]
-  ingredient   Ingredient       @relation(fields: [ingredientId], references: [id])
-  ingredientId Int
-  quantifier   Quantifier       @relation(fields: [quantifierId], references: [id])
-  quantifierId Int
-  style        IngredientStyle? @relation(fields: [styleId], references: [id])
-  styleId      Int?
-  amount       Float
+  id             Int        @id @default(autoincrement())
+  recipes        Recipe[]
+  ingredient     Ingredient @relation(fields: [ingredientName], references: [name])
+  ingredientName String
+  measureSymbol  String?
+  amount         Float
+  amount2        Float?
 }
 
 model Ingredient {
-  id              Int               @id
-  name            String            @unique
-  IngredientEntry IngredientEntry[]
-}
-
-model IngredientStyle {
-  id              Int               @id
-  style           String
-  IngredientEntry IngredientEntry[]
-}
-
-model Quantifier {
-  id              Int               @id
-  symbol          String
-  IngredientEntry IngredientEntry[]
+  name    String            @id @unique
+  entries IngredientEntry[]
 }

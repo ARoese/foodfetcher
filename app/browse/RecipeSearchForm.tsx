@@ -13,7 +13,7 @@ function RecipeSearchForm() {
             .then((data) => setDisplay(data))
     }, [page]);
 
-    console.log(display);
+    //console.log(display);
 
     return ( 
         <>
@@ -48,9 +48,7 @@ function RecipeSearchForm() {
                     <button className="ml-4" onClick={() => setPage((p) => Math.min(display.numPages,p+1))}>{">"}</button>
                 </div>
             </div>
-            
         </div>
-        
         </>
     );
 }
