@@ -1,10 +1,22 @@
 import SmallPageContainer from "@/app/components/SmallPageContainer";
-import { PrismaClient } from "@prisma/client";
-import { notFound } from "next/navigation";
+import { Prisma, PrismaClient } from "@prisma/client";
+import { notFound, useRouter } from "next/navigation";
 import { Metadata } from "next";
 import RecipeDisplay from "./RecipeDisplay";
+import { revalidatePath } from "next/cache";
 
 const prisma = new PrismaClient();
+
+type RecipeWithRelations = Prisma.RecipeGetPayload<{
+    include: {
+        creator: {
+            select: {
+                name: true
+            }
+        },
+        ingredients: true
+    }
+}>
 
 export async function generateMetadata({params: {recipeid}}) : Promise<Metadata> {
     recipeid = Number(recipeid);
@@ -32,6 +44,8 @@ export async function generateMetadata({params: {recipeid}}) : Promise<Metadata>
         title
     };
 }
+
+
 
 async function RecipeDisplayPage({params: {recipeid}}) {
     recipeid = Number(recipeid);

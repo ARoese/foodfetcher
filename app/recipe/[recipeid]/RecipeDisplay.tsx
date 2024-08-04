@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import {updateRecipe} from "@/app/dbLib"
 import recipeImage from "@/public/images/logo.png";
 import { useState } from "react";
-import type { Prisma } from "@prisma/client";
+import { PrismaClient, type Prisma } from "@prisma/client";
 import IngredientItem from "./IngredientItem";
 import {toast} from 'react-toastify'
 type RecipeWithRelations = Prisma.RecipeGetPayload<{
@@ -18,8 +19,12 @@ type RecipeWithRelations = Prisma.RecipeGetPayload<{
 }>
 import type { IngredientEntry } from "@prisma/client";
 import ReactTextareaAutosize from "react-textarea-autosize";
+import { Ingredient } from "parse-ingredient";
+import { useRouter } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 function RecipeDisplay({recipe} : {recipe: RecipeWithRelations}) {
+    const [cancelRecipe, setCancelRecipe] = useState(recipe);
     const [dynRecipe, setDynRecipe] = useState(recipe);
     const [beingEdited, setBeingEdited] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -27,25 +32,32 @@ function RecipeDisplay({recipe} : {recipe: RecipeWithRelations}) {
     /* Save a recipe back to the database */
     async function handleSaveRecipe() : Promise<void> {
         async function doSave(){
-            //if(dynRecipe == recipe){
-            //    return;
-            //}
+            if(dynRecipe == cancelRecipe){
+                toast.success("No changes to save");
+                return;
+            }
             
             const resolveAfter1Sec = new Promise(resolve => setTimeout(resolve, 3000));
-            await toast.promise(resolveAfter1Sec, {
+            
+            const promise = updateRecipe(dynRecipe);
+            
+            await toast.promise(promise, {
                     pending: "Saving recipe",
                     success: "Saved recipe",
                     error: "Failed to save recipe",
                 }, 
                 {
-                    autoClose: 10000,
-                    position: "bottom-right"
+                    autoClose: 10000
                 }
             );
         }
         setBeingEdited(false);
         setSaving(true);
-        await doSave();
+        // TODO: go back to editing if the save fails for any reason
+        // this should keep the current values that failed to save
+        // so they can be tried again or modified
+        await doSave(); 
+        setCancelRecipe(dynRecipe);
         setSaving(false);
     }
 
@@ -56,7 +68,7 @@ function RecipeDisplay({recipe} : {recipe: RecipeWithRelations}) {
             ? (
                 <>
                 <button onClick={async () => await handleSaveRecipe()}>Save</button>
-                <button onClick={() => {setDynRecipe(recipe); setBeingEdited(false)}}>Cancel</button>
+                <button onClick={() => {setDynRecipe(cancelRecipe); setBeingEdited(false)}}>Cancel</button>
                 </>
             )
             : <button disabled={saving} onClick={() => setBeingEdited(true)}>Edit</button>
@@ -107,6 +119,8 @@ return an IngredientItem for each ingredient in the recipe. Each item is given
 an updator function for the ingredient it represent
 */
 function IngredientItems(dynRecipe : RecipeWithRelations, beingEdited : boolean, setDynRecipe){
+    console.log(dynRecipe.ingredients);
+    console.log("generating ingredients");
     return dynRecipe.ingredients.map(
         (ingredient, i) => 
             <IngredientItem 
@@ -118,11 +132,13 @@ function IngredientItems(dynRecipe : RecipeWithRelations, beingEdited : boolean,
                 // all they have to do is call it with the new ingredientEntry
                 setIngredient={ 
                     (newIngredient : IngredientEntry|null) : void => {
+                        console.log(`updating ${i}`);
+                        console.log(newIngredient);
                         setDynRecipe(
                             newIngredient === null
-                            ? {...dynRecipe, ingredients: dynRecipe.ingredients.toSpliced(i, 1)}
+                            ? {...dynRecipe, ingredients: [...dynRecipe.ingredients].toSpliced(i, 1)}
                             : {...dynRecipe, ingredients: dynRecipe.ingredients.with(i, newIngredient)}
-                        )
+                        );
                     }
                 }
             />

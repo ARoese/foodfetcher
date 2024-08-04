@@ -5,6 +5,6 @@ import "react-toastify/dist/ReactToastify.css";
 
 export default function ToastContainerWrapper() {
     return (
-        <ToastContainer theme="dark" />
+        <ToastContainer theme="dark" position="bottom-right" />
     );
 }
