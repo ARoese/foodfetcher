@@ -3,10 +3,11 @@
 import Image from "next/image";
 import {updateRecipe} from "@/app/dbLib"
 import recipeImage from "@/public/images/logo.png";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { PrismaClient, type Prisma } from "@prisma/client";
 import IngredientItem from "./IngredientItem";
 import {toast} from 'react-toastify'
+import { faPlus, faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 type RecipeWithRelations = Prisma.RecipeGetPayload<{
     include: {
         creator: {
@@ -19,15 +20,18 @@ type RecipeWithRelations = Prisma.RecipeGetPayload<{
 }>
 import type { IngredientEntry } from "@prisma/client";
 import ReactTextareaAutosize from "react-textarea-autosize";
-import { Ingredient } from "parse-ingredient";
-import { useRouter } from "next/navigation";
-import { revalidatePath } from "next/cache";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Collapsible from "react-collapsible";
+import { ingredientsToText, isParsedIngredientValid, parsedIngredientToIngredientEntry, toIngredientTextGroups } from "./ingredientTools";
+import { parseIngredient } from "parse-ingredient";
 
 function RecipeDisplay({recipe} : {recipe: RecipeWithRelations}) {
     const [cancelRecipe, setCancelRecipe] = useState(recipe);
     const [dynRecipe, setDynRecipe] = useState(recipe);
     const [beingEdited, setBeingEdited] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [bulkExpanded, setBulkExpanded] = useState(false);
+    const [bulkEditText, setBulkEditText] = useState(ingredientsToText(dynRecipe.ingredients));
 
     /* Save a recipe back to the database */
     async function handleSaveRecipe() : Promise<void> {
@@ -51,6 +55,7 @@ function RecipeDisplay({recipe} : {recipe: RecipeWithRelations}) {
                 }
             );
         }
+
         setBeingEdited(false);
         setSaving(true);
         // TODO: go back to editing if the save fails for any reason
@@ -58,8 +63,48 @@ function RecipeDisplay({recipe} : {recipe: RecipeWithRelations}) {
         // so they can be tried again or modified
         await doSave(); 
         setCancelRecipe(dynRecipe);
+        // ensure bulk edit stays consistent
+        setBulkEditText(ingredientsToText(dynRecipe.ingredients))
         setSaving(false);
     }
+
+    function addNewIngredient(){
+        setDynRecipe({
+            ...dynRecipe,
+            ingredients: [
+                ...dynRecipe.ingredients,
+                {
+                    id: null,
+                    ingredientName: "new ingredient",
+                    measureSymbol: null,
+                    amount: 0,
+                    amount2: null,
+                    sortIndex: dynRecipe.ingredients.length,
+                }
+            ]
+        });
+    };
+
+    function updateBulk(){
+        const parsed = parseIngredient(bulkEditText)
+            .filter(isParsedIngredientValid)
+            .map((i) => parsedIngredientToIngredientEntry(i))
+            .map((ie, i) => ({...ie, sortIndex: i})); // set sort indexes
+        
+        setDynRecipe({
+            ...dynRecipe,
+            ingredients: parsed
+        });
+    }
+
+    
+    const bulkEditDropdownTrigger = (
+        <div className="w-full bg-teal-700 text-white flex flex-row">
+            <p className="w-full bg-teal-700 text-white mr-auto my-auto text-center">Bulk Ingredient Editing</p>
+            <FontAwesomeIcon icon={bulkExpanded ? faCaretUp : faCaretDown} className="mr-1 my-auto"/>
+        </div>
+        
+    );
 
     return ( 
         <>
@@ -90,8 +135,52 @@ function RecipeDisplay({recipe} : {recipe: RecipeWithRelations}) {
                         {
                             IngredientItems(dynRecipe, beingEdited, setDynRecipe)
                         }
+                        {   
+                            beingEdited
+                            ? (
+                                <li>
+                                    <button className="w-full" onClick={addNewIngredient}>
+                                        <FontAwesomeIcon icon={faPlus}/>
+                                    </button>
+                                </li>
+                            ) : ""
+                        }
                     </ul>
                 </div>
+                {
+                    beingEdited
+                    ? (
+                        <Collapsible 
+                            trigger={bulkEditDropdownTrigger} 
+                            className="w-full"
+                            onOpening={() => setBulkExpanded(true)}
+                            onClose={() => setBulkExpanded(false)}
+                        >
+                            {
+                                bulkExpanded
+                                ? (
+                                    <div className="p-1">
+                                        <label>
+                                            Bulk ingredient import:
+                                            <ReactTextareaAutosize
+                                                minRows={4}
+                                                style={{width: "100%"}}
+                                                wrap="soft"
+                                                value={bulkEditText}
+                                                onChange={(e) => setBulkEditText(e.target.value)}
+                                            />
+                                        </label>
+                                        <button type="submit" onClick={updateBulk}>Parse!</button>
+                                    </div>
+                                )
+                                : ""
+                            }
+                            
+                            
+                        </Collapsible>
+                    ) : ""
+                }
+                
                 <hr className="border-black border-2"/>
                 <div>
                     <h3>Instructions</h3>
@@ -107,7 +196,6 @@ function RecipeDisplay({recipe} : {recipe: RecipeWithRelations}) {
                             />
                         : <p>{dynRecipe.instructions}</p>
                     }
-                    
                 </div>
             </div>
         </div>
@@ -119,21 +207,21 @@ return an IngredientItem for each ingredient in the recipe. Each item is given
 an updator function for the ingredient it represent
 */
 function IngredientItems(dynRecipe : RecipeWithRelations, beingEdited : boolean, setDynRecipe){
-    console.log(dynRecipe.ingredients);
-    console.log("generating ingredients");
+    //console.log(dynRecipe.ingredients);
+    //console.log("generating ingredients");
     return dynRecipe.ingredients.map(
-        (ingredient, i) => 
-            <IngredientItem 
-                key={i} 
+        (ingredient, i) => {
+            return <IngredientItem 
+                key={ingredient.sortIndex} 
                 beingEdited={beingEdited}
-                ingredient={ingredient}
+                ingredient={{...ingredient, sortIndex: i}}
                 // each ingredientItem gets an updator function that will
                 // correctly and safely update the recipe state up here.
                 // all they have to do is call it with the new ingredientEntry
                 setIngredient={ 
                     (newIngredient : IngredientEntry|null) : void => {
-                        console.log(`updating ${i}`);
-                        console.log(newIngredient);
+                        //console.log(`updating ${i}`);
+                        //console.log(newIngredient);
                         setDynRecipe(
                             newIngredient === null
                             ? {...dynRecipe, ingredients: [...dynRecipe.ingredients].toSpliced(i, 1)}
@@ -142,6 +230,7 @@ function IngredientItems(dynRecipe : RecipeWithRelations, beingEdited : boolean,
                     }
                 }
             />
+        }
     )
 }
 

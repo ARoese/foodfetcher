@@ -63,7 +63,11 @@ async function RecipeDisplayPage({params: {recipeid}}) {
                     name: true
                 }
             },
-            ingredients: true
+            ingredients: {
+                orderBy: {
+                    sortIndex: 'asc'
+                }
+            }
         },
     });
 

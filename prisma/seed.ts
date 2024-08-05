@@ -1,4 +1,4 @@
-import { PrismaClient, Recipe } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 const sampleIngredients = [
@@ -9,6 +9,14 @@ const sampleIngredients = [
 const sampleMeasureSymbols = [
     "mL", "lb", "L", "tsp", "tbsp", "mg", null, "floz", "cup", "pinch", "dash"
 ]
+
+async function addWeekdays(){
+    await prisma.weekday.createMany({
+        data: ["SUNDAY", "MONDAY", "TUESDAY",
+                "WEDNESDAY", "THURSDAY", "FRIDAY",
+                "SATURDAY"].map((day) => ({name: day}))
+    });
+}
 
 async function addIngredients(){
     await prisma.ingredient.createMany({
@@ -32,15 +40,16 @@ function getRandomSlice<T>(arr : T[], n : number) : T[]{
     
 }
 
-type PartialIngredient = {ingredientName: string, amount: number, measureSymbol: string};
+type PartialIngredient = {ingredientName: string, amount: number, measureSymbol: string, sortIndex: number};
 function getRandomIngredients(n : number) : PartialIngredient[]{
     return getRandomSlice(sampleIngredients, n)
         .map(
-            (ingredient) => Object(
+            (ingredient, i) => Object(
                 {
                     ingredientName: ingredient,
                     amount: Math.random()*10,
-                    measureSymbol: getRandomElement(sampleMeasureSymbols)
+                    measureSymbol: getRandomElement(sampleMeasureSymbols),
+                    sortIndex: i
                 }
             )
         );
@@ -60,6 +69,7 @@ async function main(){
             }
     });
 
+    addWeekdays();
     addIngredients();
 
     for (const num in [...Array(10).keys()]){

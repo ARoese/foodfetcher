@@ -1,68 +1,62 @@
 "use client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { IngredientEntry } from "@prisma/client";
-import { Ingredient as parsedIngredient, parseIngredient } from "parse-ingredient";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { parsedIngredientToIngredientEntry, toIngredientTextGroups, tryParseIngredient } from "./ingredientTools";
+
 
 type args = {ingredient: IngredientEntry, beingEdited : boolean, setIngredient : (ing : IngredientEntry) => void};
+/**
+    Draws a textbox that will be continuously coerced into a proper ingredientEntry
+    so long as it can be. Whenever the textbox is updated, the component attempts to
+    parse the text into an ingredient.
+    
+    If the ingredient isn't valid, it will be drawn in red and will not be updated until
+    it becomes valid 
+    
+    If it can, then the parent will receive the new ingredient using the
+    setIngredient function passed as a prop.
 
-function isValidParsedIngredients(parsedIngredients : parsedIngredient[]) : boolean{
-    if(parsedIngredients.length != 1){
-        return false;
-    }
-
-    const parsedIngredient = parsedIngredients[0];
-    return ["", "."].indexOf(parsedIngredient.description) == -1 //non-empty description
-        && Boolean(parsedIngredient.quantity) //non-null and non-zero
-        && !parsedIngredient.isGroupHeader //isn't ghroup header
-        //&& !ParsedIngredientObj.
-}
-
+    @param ingredient The ingredient being displayed/edited
+    @param beingEdited Whether this entry should allow edits or merely display
+    @param setIngredient Function that should be called to change the ingredient
+*/
 function IngredientItem({ingredient, beingEdited, setIngredient} : args) {
-    const roundedAmount = Math.round(ingredient.amount*100)/100;
-    const symbol = ingredient.measureSymbol === null ? "" : ingredient.measureSymbol;
-    const name = ingredient.ingredientName;
-
-    const ingredTextState = {
-        valid: true,
-        text: `${roundedAmount} ${symbol} ${name}`
+    // make it into text groups. Symbol may be empty
+    const {amount, symbol, name, full: ingredientText} = toIngredientTextGroups(ingredient);
+    // default text state to go to when state is invalid (not initialized or prop change)
+    const defaultDynIngredientState = {
+        valid: tryParseIngredient(ingredientText).valid,
+        text: ingredientText
     };
     
-    const [dynIngredient, setDynIngredient] = useState(ingredTextState);
+    // contains the current text and whether or not that text is valid
+    const [dynIngredient, setDynIngredient] = useState(defaultDynIngredientState);
+    // previous ingredient passed in as a prop, for detecting prop changes
     const [prevIngredient, setPrevIngredient] = useState(ingredient);
-    // if ingredient prop changes, force the ingredient text
-    // to match it
+    // whether the user has focus on the textbox
+    const [hasFocus, setFocused] = useState(false);
+    // if ingredient prop changes, regenerate the ingredient text from it
     if(ingredient != prevIngredient){ 
         setPrevIngredient(ingredient);
-        setDynIngredient(ingredTextState);
+        setDynIngredient(defaultDynIngredientState);
     }
+
     
-
-    // This useEffect is needed to force the ingredientText
-    // to update whenever a new ingredientProp is passed in.
-    // Reach will persist the state even if the ingredient prop changes.
-    useEffect(() => setDynIngredient({
-        valid: true,
-        text: `${roundedAmount} ${symbol} ${name}`
-    }), [roundedAmount, symbol, name]);
-
-    const [hasFocus, setFocused] = useState(false);
-
+    /**
+     * whenever the user changes the contents of the ingredient text
+     * re-parse the text, and try to coerce it into a proper ingredient
+     * if it can be coerced, then update the parent with that coerced
+     * ingredientEntry using the set function
+     * */
     function onChange(e){
         const text = e.target.value;
-        let parsedIngredients = parseIngredient(text);
-        const valid = isValidParsedIngredients(parsedIngredients);
+        let {valid, parsed} = tryParseIngredient(text);
 
         if(valid){
-            let parsedIngredient = parsedIngredients[0];
-            console.log(parsedIngredient);
-            setIngredient({
-                ...ingredient,
-                ingredientName: parsedIngredient.description,
-                amount: parsedIngredient.quantity,
-                measureSymbol: parsedIngredient.unitOfMeasure
-            });
+            //console.log(parsed);
+            setIngredient(parsedIngredientToIngredientEntry(parsed, ingredient));
         }else{
             setDynIngredient({
                 valid,
@@ -77,11 +71,13 @@ function IngredientItem({ingredient, beingEdited, setIngredient} : args) {
                 beingEdited
                 ? (
                     <>
-                    {/* if we use a managed value when focused, then the
-                    // user has to fight the reformated update after each input
-                    // only difference between these is defaultValue vs value
-                    // A focused element only uses defaultValue and will not
-                    // update the user's input.)*/}
+                    {/* 
+                        if we use a managed value when focused, then the
+                        user has to fight the reformated update after each input
+                        only difference between these is defaultValue vs value
+                        A focused element only uses defaultValue and will not
+                        update the user's input.)
+                    */}
                     <input 
                         style={{width: "100%"}}
                         className={`m-1 ${dynIngredient.valid ? "" : "text-red-800"}`}
@@ -94,10 +90,12 @@ function IngredientItem({ingredient, beingEdited, setIngredient} : args) {
                     />
                     
                     {
+                        // When focused, display how the ingredient is being interpreted.
+
                         hasFocus
                         ? (
                             <>
-                            <p className="text-blue-800 whitespace-nowrap mx-0.5 my-auto">{roundedAmount}</p>
+                            <p className="text-blue-800 whitespace-nowrap mx-0.5 my-auto">{amount}</p>
                             <p className="text-amber-800 whitespace-nowrap mx-0.5 my-auto">{symbol}</p>
                             <p className="text-fuchsia-800 whitespace-nowrap mx-0.5 my-auto">{name}</p>
                             </>

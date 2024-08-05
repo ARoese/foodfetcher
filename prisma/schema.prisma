@@ -11,15 +11,19 @@ datasource db {
 }
 
 model User {
-  id       Int      @id @default(autoincrement())
-  name     String   @unique
-  passhash String?
-  recipes  Recipe[]
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  passhash  String?
+  recipes   Recipe[] @relation(name: "creator")
+  favorites Recipe[] @relation(name: "favoritedBy") 
+  plans     Plan[]
 }
 
 model Recipe {
   id           Int               @id @default(autoincrement())
-  creator      User              @relation(fields: [creatorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  creator      User              @relation(name: "creator", fields: [creatorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  favoritedBy  User[]            @relation(name: "favoritedBy")
+  inDay        PlanDay[]
   creatorId    Int
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
@@ -38,9 +42,37 @@ model IngredientEntry {
   measureSymbol  String?
   amount         Float
   amount2        Float?
+  sortIndex      Int
 }
 
 model Ingredient {
   name    String            @id @unique
   entries IngredientEntry[]
+}
+
+model Plan {
+  id           Int       @id @default(autoincrement())
+  name         String
+  owningUserId Int
+  owningUser   User      @relation(fields: [owningUserId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  days         PlanDay[]
+
+  @@unique([name, owningUserId], name: "noDuplicateNamesForUser")
+}
+
+model PlanDay {
+  id      Int      @id @default(autoincrement())
+  dayName String
+  weekday Weekday  @relation(fields: [dayName], references: [name])
+  planId  Int
+  inPlan  Plan     @relation(fields: [planId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  recipes Recipe[]
+
+  @@unique([planId, dayName], name: "noDuplicateDays")
+}
+
+// Enum of SSMTWTF
+model Weekday {
+  name       String    @id @unique
+  inPlanDays PlanDay[]
 }
