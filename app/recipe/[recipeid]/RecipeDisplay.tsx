@@ -1,10 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import {updateRecipe} from "@/app/dbLib"
+import {deleteRecipe, updateRecipe} from "@/app/dbLib"
 import recipeImage from "@/public/images/logo.png";
 import { useState } from "react";
 import { IngredientEntry, PrismaClient, type Prisma } from "@prisma/client";
+import { useRouter } from 'next/navigation'
 import {toast} from 'react-toastify'
 type RecipeWithRelations = Prisma.RecipeGetPayload<{
     include: {
@@ -19,12 +20,17 @@ type RecipeWithRelations = Prisma.RecipeGetPayload<{
 import ReactTextareaAutosize from "react-textarea-autosize";
 import IngredientsDisplay from "./IngredientsDisplay";
 import BulkIngredientEditor from "./BulkIngredientEditor";
+import { redirect } from "next/navigation";
 
-function RecipeDisplay({recipe} : {recipe: RecipeWithRelations}) {
+type args = {recipe: RecipeWithRelations, creatingNew : boolean, canEdit : boolean};
+
+/** Facilitates viewing and editing of a single recipe */
+function RecipeDisplay({recipe, creatingNew = false, canEdit = false} : args) {
     const [cancelRecipe, setCancelRecipe] = useState(recipe);
     const [dynRecipe, setDynRecipe] = useState(recipe);
-    const [beingEdited, setBeingEdited] = useState(false);
+    const [beingEdited, setBeingEdited] = useState(creatingNew);
     const [saving, setSaving] = useState(false);
+    const router = useRouter();
 
     /** Update the ingredients member of the recipe */
     function setIngredients(ingredients : IngredientEntry[]){
@@ -41,7 +47,13 @@ function RecipeDisplay({recipe} : {recipe: RecipeWithRelations}) {
             
             const resolveAfter1Sec = new Promise(resolve => setTimeout(resolve, 3000));
             
-            const promise = updateRecipe(dynRecipe);
+            // update the recipe in the db
+            // if we are creating, we want to redirect to the view page of that recipe
+            // so that we don't stay on the create page after the recipe exists.
+            // This would prevent people from trying to share their newly created recipe and
+            // instead sharing the create page
+            const promise = updateRecipe(dynRecipe)
+                            .then((recipe) => creatingNew ? router.push(`./${recipe.id}`) : null);
             
             await toast.promise(promise, {
                     pending: "Saving recipe",
@@ -50,7 +62,7 @@ function RecipeDisplay({recipe} : {recipe: RecipeWithRelations}) {
                 }, 
                 {
                     autoClose: 10000
-                }
+                },
             );
         }
 
@@ -70,30 +82,43 @@ function RecipeDisplay({recipe} : {recipe: RecipeWithRelations}) {
         setSaving(false);
     }
 
+    async function handleDeleteRecipe(){
+        if(!window.confirm("Delete recipe?")){
+            return;
+        }
+
+        deleteRecipe(dynRecipe);
+        router.push("/");
+    }
+
     return ( 
         <>
         {
             beingEdited
             ? (
                 <>
-                <button onClick={async () => await handleSaveRecipe()}>Save</button>
-                <button onClick={() => {setDynRecipe(cancelRecipe); setBeingEdited(false)}}>Cancel</button>
+                <div className="flex flex-row">
+                    <button onClick={async () => await handleSaveRecipe()}>Save</button>
+                    <button onClick={() => {setDynRecipe(cancelRecipe); setBeingEdited(false)}}>Cancel</button>
+                    <button className="text-red-800 ml-auto" onClick={async () => await handleDeleteRecipe()}>Delete</button>
+                </div>
                 <div className="mx-auto text-center">
                     <input className="text-center"
                         value={dynRecipe.name} 
+                        minLength={20}
                         onChange={(e) => setDynRecipe({...dynRecipe, name: e.target.value})}
                     />
                 </div>
                 </>
             ) : (
                 <>
-                <button disabled={saving} onClick={() => setBeingEdited(true)}>Edit</button>
+                {canEdit ? <button disabled={saving} onClick={() => setBeingEdited(true)}>Edit</button> : ""}
                 <h1>{dynRecipe.name}</h1>
                 </>
             )
         }
         <h2>{dynRecipe.creator.name}</h2>
-        <h2>{dynRecipe.updatedAt.toISOString()}</h2>
+        <h2>{dynRecipe.updatedAt ? dynRecipe.updatedAt.toISOString() : ""}</h2>
         <div className="flex flex-row">
             <Image className="w-2/5 h-fit" width="0" height="0" src={recipeImage} alt="Recipe cover image"/>
             <div className="flex flex-col w-full">
@@ -124,6 +149,7 @@ function RecipeDisplay({recipe} : {recipe: RecipeWithRelations}) {
                             wrap="soft"
                             value={dynRecipe.instructions} 
                             onChange={(e) => setDynRecipe({...dynRecipe, instructions: e.target.value})}
+                            placeholder="Instructions on how to make your recipe"
                             />
                         : <p>{dynRecipe.instructions}</p>
                     }

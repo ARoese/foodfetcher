@@ -22,7 +22,7 @@ export default async function Nav(){
                     <div id = "nav">
                         <Link href="/">Home</Link>
                         <Link href="/browse">Browse Recipes</Link>
-                        <Link href="/create">Create Recipe</Link>
+                        <Link href="/recipe/create">Create Recipe</Link>
                         <Link href="/MealPlans">Meal Plans</Link>
                         {
                             isLoggedIn ? (

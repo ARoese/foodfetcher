@@ -1,6 +1,6 @@
 "use server";
 
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Recipe } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -17,8 +17,20 @@ export async function getRecipes(page : number = 1, count : number = 12){
     return {numPages, recipes};
 }
 
-export async function updateRecipe({ id, creatorId, name, instructions, videoFile, imageFile, ingredients} ) : Promise<void>{
-    await prisma.recipe.upsert({
+// TODO: handle protecting these using session
+// make a function that just checks if the caller is the owner
+// before making modificiations
+
+export async function deleteRecipe(recipe : Recipe){
+    await prisma.recipe.delete({
+        where: {
+            id: recipe.id
+        }
+    });
+}
+
+export async function updateRecipe({ id, creatorId, name, instructions, videoFile, imageFile, ingredients} ) : Promise<Recipe>{
+    return await prisma.recipe.upsert({
         where: { id: id || -1 },  // Assuming id will be null for new recipes
         update: {
             name,

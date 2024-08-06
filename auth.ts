@@ -1,9 +1,8 @@
 import { PrismaClient } from "@prisma/client"
-import NextAuth, { User } from "next-auth"
+import NextAuth, { DefaultSession, User } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 // Your own logic for dealing with plaintext password strings; be careful!
 //import { saltAndHashPassword } from "@/utils/password"
-
 
 const prisma = new PrismaClient();
 const crypto = require("crypto");
@@ -25,6 +24,7 @@ async function credentialsAuthorize(credentials) : Promise<User> {
 	}
 
 	return {
+		id: String(user.id),
 		name: user.name
 	};
 }
@@ -43,4 +43,19 @@ const providers = [
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
 	providers,
+	callbacks: {
+		async jwt({user, token}) {
+			if(user){
+				token.sub = user.id;
+			}
+			return token;
+		},
+
+		async session({session, token}) {
+			if(token?.sub){
+				session.user.id = token.sub;
+			}
+			return session;
+		},
+	}
 });
