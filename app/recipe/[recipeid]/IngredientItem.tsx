@@ -33,10 +33,10 @@ function IngredientItem({ingredient, beingEdited, setIngredient} : args) {
     
     // contains the current text and whether or not that text is valid
     const [dynIngredient, setDynIngredient] = useState(defaultDynIngredientState);
-    // previous ingredient passed in as a prop, for detecting prop changes
-    const [prevIngredient, setPrevIngredient] = useState(ingredient);
     // whether the user has focus on the textbox
     const [hasFocus, setFocused] = useState(false);
+    // previous ingredient passed in as a prop, for detecting prop changes
+    const [prevIngredient, setPrevIngredient] = useState(ingredient);
     // if ingredient prop changes, regenerate the ingredient text from it
     if(ingredient != prevIngredient){ 
         setPrevIngredient(ingredient);

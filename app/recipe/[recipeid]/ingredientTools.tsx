@@ -9,6 +9,7 @@ export function tryParseIngredient(ingredientText : string) : {valid: boolean, p
          parsed: parsed[0]
     };
 }
+
 export function isParsedIngredientValid(ingredient : ParsedIngredient){
     return ["", "."].indexOf(ingredient.description.trim()) == -1 //non-empty description
         && ingredient.quantity !== null // must specify quantity
