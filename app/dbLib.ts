@@ -1,12 +1,13 @@
 "use server";
 
-import { PrismaClient, Recipe } from "@prisma/client";
+import { auth, createPassword, verifyPasswordAgainstDB } from "@/auth";
+import { PrismaClient, Recipe, User } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 export async function getRecipes(page : number = 1, count : number = 12){
     page-=1;
-    const numPages = Math.ceil(await prisma.recipe.count() / count); // TODO: do critera
+    const numPages = Math.ceil(await prisma.recipe.count() / count); // TODO: do criteria
     const recipes = await prisma.recipe.findMany(
         {
             skip: page*count,
@@ -17,19 +18,43 @@ export async function getRecipes(page : number = 1, count : number = 12){
     return {numPages, recipes};
 }
 
-// TODO: handle protecting these using session
-// make a function that just checks if the caller is the owner
-// before making modificiations
+async function checkCanModifyRecipe(recipeId : number){
+    // get session and recipe we're modifying
+    const [session, recipe] = await Promise.all(
+        [
+            auth(),
+            prisma.recipe.findUnique({
+                where: {
+                    id: recipeId
+                }
+            })
+        ]
+    );
 
-export async function deleteRecipe(recipe : Recipe){
+    // check it's ok to delete it
+    if(!session){
+        throw new Error("Not logged in");
+    }else if(recipe === null){
+        throw new Error("Recipe does not exist");
+    }else if(+session.user.id != recipe.creatorId){
+        throw new Error("You do not own this recipe");
+    }
+}
+
+export async function deleteRecipe(recipeId : number){
+    // verify caller has permission to delete this recipe
+    checkCanModifyRecipe(recipeId);
+    // actually delete it
     await prisma.recipe.delete({
         where: {
-            id: recipe.id
+            id: recipeId
         }
     });
 }
 
 export async function updateRecipe({ id, creatorId, name, instructions, videoFile, imageFile, ingredients} ) : Promise<Recipe>{
+    // verify caller has permission to delete this recipe
+    checkCanModifyRecipe(id);
     return await prisma.recipe.upsert({
         where: { id: id || -1 },  // Assuming id will be null for new recipes
         update: {
@@ -76,6 +101,26 @@ export async function updateRecipe({ id, creatorId, name, instructions, videoFil
             }
             }))
         }
+        }
+    });
+}
+
+export async function updateUser(userId : number, userName : string, currentPassword : string, newPassword : string|undefined) : Promise<void>{
+    // only user who know their own passwords can get through this function anyways; no
+    // need to ensure they are actually logged in or anything
+    if(!verifyPasswordAgainstDB(currentPassword, userId)){
+        throw new Error("Incorrect current password");
+    }
+
+    // TODO: make sure new validated password is valid
+    const newPasswordHash = newPassword !== undefined ? await createPassword(newPassword) : undefined;
+    await prisma.user.update({
+        where: {
+            id: userId
+        },
+        data: {
+            name: userName,
+            passhash: newPasswordHash
         }
     });
 }

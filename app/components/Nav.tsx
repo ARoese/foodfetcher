@@ -9,7 +9,7 @@ export default async function Nav(){
     const session = await auth();
     const isLoggedIn = Boolean(session);
     const log = isLoggedIn ? "Logout" : "Login";
-    console.log(session);
+    //console.log(session);
     return (
         <>
             <nav id="navbar">
@@ -28,7 +28,7 @@ export default async function Nav(){
                             isLoggedIn ? (
                             <>
                                 <div id='logout'>
-                                    Hello, <Link href="/viewAccount">{session.user.name}</Link><br/>
+                                    Hello, <Link href="/account">{session.user.name}</Link><br/>
                                     <LogOutButton/><br/>
                                 </div>
                             </>

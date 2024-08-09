@@ -1,11 +1,44 @@
 import { PrismaClient } from "@prisma/client"
-import NextAuth, { DefaultSession, User } from "next-auth"
+import { randomBytes, scryptSync } from "crypto";
+import NextAuth, { CredentialsSignin, DefaultSession, User } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 // Your own logic for dealing with plaintext password strings; be careful!
 //import { saltAndHashPassword } from "@/utils/password"
 
+const BUFFER_ENCODING = 'base64'
+
+export function doPasswordHash(password : string, salt : string) : string{
+    return scryptSync(password, salt, 64).toString(BUFFER_ENCODING);
+}
+
+export function createPassword(password : string) : string {
+    const salt = randomBytes(32).toString(BUFFER_ENCODING);
+    const hash = doPasswordHash(password, salt);
+	// TODO: make these different fields in the DB
+    return `${hash}$${salt}`;
+}
+
+export function verifyPassword(password : string, stringFromDB : string) : boolean {
+	if(stringFromDB === null){
+		return true;
+	}
+	// TODO: make these different fields in the DB
+    const [hash, salt] = stringFromDB.split('$');
+    const hashed = doPasswordHash(password, salt);
+    return hashed == hash;
+}
+
+export async function verifyPasswordAgainstDB(password : string, userId : number) : Promise<boolean>{
+    const userFromDB = await prisma.user.findUnique({
+        where: {
+            id: userId
+        }
+    });
+
+    return verifyPassword(password, userFromDB.passhash);
+}
+
 const prisma = new PrismaClient();
-const crypto = require("crypto");
 async function credentialsAuthorize(credentials) : Promise<User> {
 	const user = await prisma.user.findUnique({
 			where: {
@@ -15,12 +48,13 @@ async function credentialsAuthorize(credentials) : Promise<User> {
 	);
 
 	if (user === null){
-		throw new Error("User not found");
+		throw new CredentialsSignin("User not found");
 	}
 
-	// TODO: password checking
-	if(user.passhash !== null){
-		throw new Error("Incorrect Password");
+	// null password means to let anyone log in
+	// TODO:? do one-time password stuff here, maybe
+	if(user.passhash !== null && !verifyPassword(credentials.password, user.passhash)){
+		throw new CredentialsSignin("Incorrect Password");
 	}
 
 	return {
