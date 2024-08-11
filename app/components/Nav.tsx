@@ -23,7 +23,7 @@ export default async function Nav(){
                         <Link href="/">Home</Link>
                         <Link href="/browse">Browse Recipes</Link>
                         <Link href="/recipe/create">Create Recipe</Link>
-                        <Link href="/MealPlans">Meal Plans</Link>
+                        <Link href="/plans">Meal Plans</Link>
                         {
                             isLoggedIn ? (
                             <>

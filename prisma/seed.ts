@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { DAYS } from "./consts";
 const prisma = new PrismaClient();
 
 const sampleIngredients = [
@@ -12,9 +13,7 @@ const sampleMeasureSymbols = [
 
 async function addWeekdays(){
     await prisma.weekday.createMany({
-        data: ["SUNDAY", "MONDAY", "TUESDAY",
-                "WEDNESDAY", "THURSDAY", "FRIDAY",
-                "SATURDAY"].map((day) => ({name: day}))
+        data: DAYS.map((day) => ({name: day}))
     });
 }
 

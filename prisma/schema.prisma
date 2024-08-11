@@ -64,11 +64,12 @@ model Plan {
 model PlanDay {
   id      Int      @id @default(autoincrement())
   dayName String
-  weekday Weekday  @relation(fields: [dayName], references: [name])
+  weekday Weekday  @relation(fields: [dayName], references: [name], onDelete: Cascade, onUpdate: Cascade)
   planId  Int
   inPlan  Plan     @relation(fields: [planId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   recipes Recipe[]
-
+// TODO: referential actions on plan days and weekdays and such.
+// Recipes being deleted should delete them in the meal plans 
   @@unique([planId, dayName], name: "noDuplicateDays")
 }
 
