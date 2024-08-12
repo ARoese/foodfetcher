@@ -172,6 +172,75 @@ export async function updateRecipe({ id, creatorId, name, instructions, videoFil
     });
 }
 
+export async function hasFavorited(recipeId : number) : Promise<boolean> {
+    const session = await auth();
+    if(session == null){
+        throw new Error("You are not logged in");
+    }
+
+    const favoritesCount = await prisma.user.findUnique({
+        where: {
+            id: +session.user.id
+        },
+        select: {
+            _count: {
+                select: {
+                    favorites: {
+                        where: {
+                            id: recipeId
+                        }
+                    }
+                }
+            }
+        }
+    });
+    console.log(favoritesCount);
+
+    return favoritesCount._count.favorites > 0;
+}
+
+export async function setFavorite(recipeId : number, isFavorited : boolean) {
+    const session = await auth();
+    if(session == null){
+        throw new Error("You are not logged in");
+    } 
+
+    const [currentFavorites, addedFavorite] = await Promise.all([
+        prisma.user.findUnique({
+            where: {
+                id: +session.user.id
+            },
+            select: {
+                favorites: true
+            }
+        }),
+        prisma.recipe.findUnique({
+            where: {
+                id: recipeId
+            }
+        })
+    ]);
+
+    await prisma.user.update({
+        where: {
+            id: +session.user.id
+        },
+        data: {
+            favorites: 
+            isFavorited ? {
+                connect: {
+                    id: recipeId
+                }
+            }
+            : {
+                disconnect: {
+                    id: recipeId
+                }
+            }
+        }
+    });
+}
+
 export async function updateUser(userId : number, userName : string, currentPassword : string, newPassword : string|undefined) : Promise<void>{
     // only user who know their own passwords can get through this function anyways; no
     // need to ensure they are actually logged in or anything

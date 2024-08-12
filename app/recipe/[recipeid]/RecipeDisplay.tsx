@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import {deleteRecipe, updateRecipe} from "@/app/dbLib"
+import {deleteRecipe, setFavorite, updateRecipe} from "@/app/dbLib"
 import recipeImage from "@/public/images/logo.png";
 import { useState } from "react";
 import { IngredientEntry, PrismaClient, type Prisma } from "@prisma/client";
@@ -20,16 +20,22 @@ type RecipeWithRelations = Prisma.RecipeGetPayload<{
 import ReactTextareaAutosize from "react-textarea-autosize";
 import IngredientsDisplay from "./IngredientsDisplay";
 import BulkIngredientEditor from "./BulkIngredientEditor";
-import { redirect } from "next/navigation";
 
-type args = {recipe: RecipeWithRelations, creatingNew : boolean, canEdit : boolean};
+type args = {
+    recipe: RecipeWithRelations,
+    creatingNew : boolean,
+    canEdit : boolean,
+    isFavorited : boolean,
+    isLoggedIn : boolean
+};
 
 /** Facilitates viewing and editing of a single recipe */
-function RecipeDisplay({recipe, creatingNew = false, canEdit = false} : args) {
+function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorited, isLoggedIn} : args) {
     const [cancelRecipe, setCancelRecipe] = useState(recipe);
     const [dynRecipe, setDynRecipe] = useState(recipe);
     const [beingEdited, setBeingEdited] = useState(creatingNew);
     const [saving, setSaving] = useState(false);
+    const [favorited, setFavorited] = useState(isFavorited);
     const router = useRouter();
 
     /** Update the ingredients member of the recipe */
@@ -87,8 +93,14 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false} : args) {
             return;
         }
 
-        deleteRecipe(dynRecipe);
+        deleteRecipe(dynRecipe.id);
         router.push("/");
+    }
+
+    async function clickFavorite(){
+        // TODO: add toast?
+        await setFavorite(dynRecipe.id, !favorited);
+        setFavorited(!favorited);
     }
 
     return ( 
@@ -113,6 +125,15 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false} : args) {
             ) : (
                 <>
                 {canEdit ? <button disabled={saving} onClick={() => setBeingEdited(true)}>Edit</button> : ""}
+                {
+                    dynRecipe.id != null && dynRecipe.id != undefined && isLoggedIn
+                    ?
+                        favorited
+                        ? <button onClick={clickFavorite}>Remove Favorite</button>
+                        : <button onClick={clickFavorite}>Favorite</button>
+                    : ""
+                }
+                
                 <h1>{dynRecipe.name}</h1>
                 </>
             )

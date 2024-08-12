@@ -6,6 +6,7 @@ import RecipeDisplay from "./RecipeDisplay";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { signIn } from "next-auth/react";
+import { hasFavorited } from "@/app/dbLib";
 
 const prisma = new PrismaClient();
 
@@ -125,10 +126,16 @@ async function RecipeDisplayPage({params: {recipeid}}) {
     }
 
     const canEdit = creating || currentUser !== null && recipe.creatorId == currentUser.id;
-
+    const isFavorited = recipe.id ? await hasFavorited(recipe.id) : false;
     return ( 
         <SmallPageContainer>
-            <RecipeDisplay recipe={recipe} creatingNew={creating} canEdit={canEdit}/>
+            <RecipeDisplay 
+                recipe={recipe}
+                creatingNew={creating}
+                canEdit={canEdit}
+                isFavorited={isFavorited}
+                isLoggedIn={Boolean(currentUser)}
+            />
         </SmallPageContainer>
      );
 }

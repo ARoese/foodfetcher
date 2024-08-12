@@ -91,7 +91,6 @@ function IngredientItem({ingredient, beingEdited, setIngredient} : args) {
                     
                     {
                         // When focused, display how the ingredient is being interpreted.
-
                         hasFocus
                         ? (
                             <>
