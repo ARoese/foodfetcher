@@ -3,14 +3,22 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PlanContainer from "./PlanContainer";
 import { useState } from "react";
-import { Plan } from "@prisma/client"
+import { Plan, Recipe } from "@prisma/client"
 import { DeepPlan, deleteMealPlan, newMealPlan } from "../dbLib";
 import { toast } from "react-toastify";
+import DraggableRecipeList from "./DraggableRecipeList";
+import Select from 'react-select';
 
-type args = {plans : DeepPlan[], userId : number};
-function PlanDisplay({plans, userId} : args) {
+type args = {plans : DeepPlan[], userId : number, favorites : Recipe[], ownRecipes : Recipe[]};
+function PlanDisplay({plans, userId, favorites, ownRecipes} : args) {
+    const sourceGroups = [
+        {value: favorites, label: "Favorites"},
+        {value: ownRecipes, label: "Owned"}
+    ]
     const [editing, setEditing] = useState(false);
     const [dynPlans, setDynPlans] = useState(plans);
+    const [recipeSource, setRecipeSource] = useState(sourceGroups[0]);
+    //console.log(favorites, ownRecipes);
 
     
     async function addPlan(){
@@ -51,9 +59,20 @@ function PlanDisplay({plans, userId} : args) {
         }
     }
 
+    
+
     return ( 
         <>
         <button onClick={() => setEditing(!editing)}>{editing ? "Stop Editing" : "Edit"}</button>
+        { /* TODO: hide if empty */
+            editing && 
+            <>
+            <h2>Select a recipes list:</h2>
+            <Select isSearchable={false} onChange={(newVal) => setRecipeSource(newVal)} value={recipeSource} className="w-fit mx-auto" options={sourceGroups}/>
+            <DraggableRecipeList recipes={recipeSource.value}/>
+            </>
+        }
+        
         {
             dynPlans.map(
                 (plan, i) => (

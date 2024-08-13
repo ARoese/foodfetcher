@@ -2,7 +2,7 @@
 
 import { auth, createPassword, verifyPasswordAgainstDB } from "@/auth";
 import { DAYS } from "@/prisma/consts";
-import { Prisma, PrismaClient, Recipe, User } from "@prisma/client";
+import { Plan, Prisma, PrismaClient, Recipe, User } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -19,6 +19,43 @@ export async function getRecipes(page : number = 1, count : number = 12){
     return {numPages, recipes};
 }
 
+export async function getOwnRecipes() : Promise<Recipe[]> {
+    const session = await auth();
+    if(session == null){
+        throw new Error("You are not logged in");
+    }
+
+    const userReq = await prisma.user.findUnique({
+        where: {
+            id: +session.user.id
+        },
+        select: {
+            recipes: true
+        }
+    });
+
+    return userReq.recipes;
+}
+
+export async function getFavorites() : Promise<Recipe[]> {
+    const session = await auth();
+    if(session == null){
+        throw new Error("You are not logged in");
+    }
+
+    const userReq = await prisma.user.findUnique({
+        where: {
+            id: +session.user.id
+        },
+        select: {
+            favorites: true
+        }
+    });
+
+    return userReq.favorites;
+}
+
+// make sure these two match
 export type DeepPlan = Prisma.PlanGetPayload<{
     include: {
         days: {
@@ -37,27 +74,39 @@ const deepPlanInclude = {
         }
     }
 }
-export async function getMealPlans(userId : number) : Promise<DeepPlan[]> {
-    // TODO: bug: this doesn't return the created plans on subsequent calls. Figure out why.
-    const plans = await prisma.plan.findMany({
-        where: {
-            id: userId,
-        },
-        include: deepPlanInclude
-    });
 
+function sortPlanDays(plan : DeepPlan){
     // sort the days by their names so that the days are in 
     // the same order as they appear in this global DAYS array
-    for(let {days} of plans){
-        days.sort((a, b) => DAYS.indexOf(a.dayName) - DAYS.indexOf(b.dayName));
+    plan.days.sort((a, b) => DAYS.indexOf(a.dayName) - DAYS.indexOf(b.dayName));
+}
+
+export async function getMealPlans() : Promise<DeepPlan[]> {
+    const session = await auth();
+    if(session == null){
+        throw new Error("You are not logged in");
     }
-    //console.log(userId, plans);
-    return plans;
+    // TODO: bug: this doesn't return the created plans on subsequent calls. Figure out why.
+    const user = await prisma.user.findUnique({
+        where: {
+            id: +session.user.id
+        },
+        include: {
+            plans: {
+                include: deepPlanInclude
+            }
+        }
+    });
+
+    user.plans.forEach(sortPlanDays);
+    
+    console.log(user);
+    return user.plans;
 }
 
 export async function newMealPlan(userId : number) : Promise<DeepPlan> {
     // TODO: protect this
-    return await prisma.plan.create({
+    const newPlan = await prisma.plan.create({
         data: {
             name: "New Meal Plan",
             days: {
@@ -73,7 +122,10 @@ export async function newMealPlan(userId : number) : Promise<DeepPlan> {
             }
         },
         include: deepPlanInclude
-    })
+    });
+
+    sortPlanDays(newPlan);
+    return newPlan;
 }
 
 export async function deleteMealPlan(planId : number){
@@ -119,6 +171,7 @@ export async function deleteRecipe(recipeId : number){
     });
 }
 
+// TODO: clean up these parameters
 export async function updateRecipe({ id, creatorId, name, instructions, videoFile, imageFile, ingredients} ) : Promise<Recipe>{
     // verify caller has permission to delete this recipe
     checkCanModifyRecipe(id);
@@ -175,7 +228,7 @@ export async function updateRecipe({ id, creatorId, name, instructions, videoFil
 export async function hasFavorited(recipeId : number) : Promise<boolean> {
     const session = await auth();
     if(session == null){
-        throw new Error("You are not logged in");
+        return false;
     }
 
     const favoritesCount = await prisma.user.findUnique({
@@ -205,6 +258,7 @@ export async function setFavorite(recipeId : number, isFavorited : boolean) {
         throw new Error("You are not logged in");
     } 
 
+    /*
     const [currentFavorites, addedFavorite] = await Promise.all([
         prisma.user.findUnique({
             where: {
@@ -220,6 +274,7 @@ export async function setFavorite(recipeId : number, isFavorited : boolean) {
             }
         })
     ]);
+    */
 
     await prisma.user.update({
         where: {

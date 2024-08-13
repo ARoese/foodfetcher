@@ -2,8 +2,9 @@
 
 import SmallPageContainer from "../components/SmallPageContainer";
 import { auth, signIn } from "@/auth";
-import { getMealPlans } from "../dbLib";
+import { getFavorites, getMealPlans, getOwnRecipes } from "../dbLib";
 import PlanDisplay from "./PlanDisplay";
+import DraggableRecipeList from "./DraggableRecipeList";
 
 export async function generateMetadata() {
     return {
@@ -21,12 +22,16 @@ async function MealPlanPage() {
     // this is so that we can just rely on it all being present in children
     // components
     // TODO: this get could be more lazy, but only if it's actually a problem. (it probably isn't)
-    const plans = await getMealPlans(+session.user.id);
+    const [favorites, ownRecipes, plans] = await Promise.all([
+        getFavorites(),
+        getOwnRecipes(),
+        getMealPlans()
+    ]);
 
     return ( 
         <SmallPageContainer>
             <h1>Meal plans</h1>
-            <PlanDisplay plans={plans} userId={+session.user.id}/>
+            <PlanDisplay plans={plans} userId={+session.user.id} favorites={favorites} ownRecipes={ownRecipes}/>
         </SmallPageContainer>
      );
 }

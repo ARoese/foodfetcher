@@ -8,7 +8,7 @@ function DayContainer({day, setDay} : args) {
         <>
         <div className="flex-1 mx-2">
             <h1>{day.dayName}</h1>
-            <div className="flex flex-col border-black border-2 min-h-16">
+            <div className="flex flex-col border-black border-2 min-h-48">
                 {/* TODO: add draggable smallRecipe components here */}
             </div>
         </div>
