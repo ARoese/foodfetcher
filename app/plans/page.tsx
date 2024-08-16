@@ -5,6 +5,7 @@ import { auth, signIn } from "@/auth";
 import { getFavorites, getMealPlans, getOwnRecipes } from "../dbLib";
 import PlanDisplay from "./PlanDisplay";
 import DraggableRecipeList from "./DraggableRecipeList";
+import { DndContext } from "@dnd-kit/core";
 
 export async function generateMetadata() {
     return {
@@ -31,6 +32,7 @@ async function MealPlanPage() {
     return ( 
         <SmallPageContainer>
             <h1>Meal plans</h1>
+            
             <PlanDisplay plans={plans} userId={+session.user.id} favorites={favorites} ownRecipes={ownRecipes}/>
         </SmallPageContainer>
      );

@@ -73,7 +73,7 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorite
         }
 
         if(!dynRecipe.ingredients.every((ingredient) => ingredient.amount != 0)){
-            toast.error("One or more of your ingredients are invalid. Fix them before submitting.");
+            toast.error("One or more of your ingredients are invalid because the amount is 0. Fix them before submitting.");
             return;
         }
 

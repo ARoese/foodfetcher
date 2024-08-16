@@ -75,6 +75,30 @@ const deepPlanInclude = {
     }
 }
 
+export async function updatePlan(plan : DeepPlan) : Promise<void> {
+    await prisma.plan.update({
+        where: {
+            id: plan.id
+        },
+        data: {
+            name: plan.name,
+            days: {
+                deleteMany: {},
+                create: plan.days.map((day) => ({
+                    weekday: {
+                        connect: {
+                            name: day.dayName
+                        }
+                    },
+                    recipes: {
+                        connect: day.recipes
+                    }
+                }))
+            }
+        }
+    });
+}
+
 function sortPlanDays(plan : DeepPlan){
     // sort the days by their names so that the days are in 
     // the same order as they appear in this global DAYS array
@@ -186,16 +210,16 @@ export async function updateRecipe({ id, creatorId, name, instructions, videoFil
             ingredients: {
                 deleteMany: {},  // Clear existing ingredient entries to handle updates
                 create: ingredients.map(ingredientEntry => ({
-                amount: ingredientEntry.amount,
-                amount2: ingredientEntry.amount2,
-                measureSymbol: ingredientEntry.measureSymbol,
-                sortIndex: ingredientEntry.sortIndex,
-                ingredient: {
-                    connectOrCreate: {
-                    where: { name: ingredientEntry.ingredientName },
-                    create: { name: ingredientEntry.ingredientName }
+                    amount: ingredientEntry.amount,
+                    amount2: ingredientEntry.amount2,
+                    measureSymbol: ingredientEntry.measureSymbol,
+                    sortIndex: ingredientEntry.sortIndex,
+                    ingredient: {
+                        connectOrCreate: {
+                        where: { name: ingredientEntry.ingredientName },
+                        create: { name: ingredientEntry.ingredientName }
+                        }
                     }
-                }
                 }))
             }
         },

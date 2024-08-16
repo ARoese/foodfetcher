@@ -9,10 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.1.0",
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@prisma/client": "^5.17.0",
+    "deep-equal": "^2.2.3",
     "next": "14.2.5",
     "next-auth": "^5.0.0-beta.20",
     "parse-ingredient": "^1.2.1",
