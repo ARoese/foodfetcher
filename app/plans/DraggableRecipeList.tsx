@@ -8,10 +8,10 @@ type args = {recipes : Recipe[]};
 function DraggableRecipeList({recipes} : args) {
     //console.log(recipes);
     return ( 
-        <div className="flex flex-row overflow-x-scroll flex-nowrap border-2 border-black">
+        <div className="flex flex-row overflow-x-scroll min-h-32 flex-nowrap border-2 border-black">
             {
                 recipes.map(
-                    (recipe) => <DraggableSmallRecipe key={recipe.id} recipe={recipe}/>
+                    (recipe) => <DraggableSmallRecipe key={`draggableSource ${recipe.id}`} recipe={recipe}/>
                 )
             }
         </div>

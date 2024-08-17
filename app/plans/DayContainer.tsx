@@ -60,7 +60,6 @@ function DayContainer({day, setDay, editing} : args) {
         <>
         <div ref={setNodeRef} className="flex-1 mx-2">
             <div className="h-full flex flex-col">
-            <h1>{day.dayName}</h1>
             <div className="flex flex-col flex-1 border-black border-2 min-h-48">
                 {
                     day.quantRecipes.map(
@@ -91,6 +90,7 @@ function DayContainer({day, setDay, editing} : args) {
                 }
                 {/* TODO: add draggable smallRecipe components here? */}
             </div>
+            <h1>{day.dayName}</h1>
             </div>
         </div>
         </>

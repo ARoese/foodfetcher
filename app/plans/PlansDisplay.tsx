@@ -141,7 +141,7 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
     }
 
     return ( 
-        <DndContext 
+        <DndContext autoScroll={false}
             onDragStart={(event) => {setDraggingRecipe(event.active.data); console.log(event.active.data)}}
             onDragEnd={handleDragEnd}
         >
@@ -186,7 +186,7 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
         {
             editing && 
             <>
-            <h2>Select a recipes list:</h2>
+            <h2>Select a list of recipes to drag from:</h2>
             <Select 
                 isSearchable={false}
                 onChange={setRecipeSource} 
