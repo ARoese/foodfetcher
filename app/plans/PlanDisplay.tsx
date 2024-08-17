@@ -73,10 +73,22 @@ function PlanDisplay({plans, userId, favorites, ownRecipes} : args) {
         const [planId, dayName] = over.id.split(" ");
         const targetPlanIndex = dynPlans.findIndex((plan) => plan.id == +planId);
         const targetDayIndex = dynPlans[targetPlanIndex].days.findIndex((day) => day.dayName == dayName);
-        const numRecipesInDay = dynPlans[targetPlanIndex].days[targetDayIndex].recipes.length;
+        const numQRecipesInDay = dynPlans[targetPlanIndex].days[targetDayIndex].quantRecipes.length;
         // this makes things much more convenient than a massively nested series of spreads and withs
         const newDynPlans = structuredClone(dynPlans);
-        newDynPlans[targetPlanIndex].days[targetDayIndex].recipes[numRecipesInDay] = active.data.current;
+        const quantRecipeIndex = dynPlans[targetPlanIndex].days[targetDayIndex].quantRecipes.findIndex((qr) => qr.recipeId == active.data.current.id);
+        // TODO: map this new qRecipe id into a negative number and map that id to null?
+        if(quantRecipeIndex != -1){
+            newDynPlans[targetPlanIndex].days[targetDayIndex].quantRecipes[quantRecipeIndex].quantity++;
+        }else{
+            newDynPlans[targetPlanIndex].days[targetDayIndex].quantRecipes[numQRecipesInDay] = {
+                id: -numQRecipesInDay,
+                quantity: 1,
+                recipeId: active.data.current.id,
+                recipe: active.data.current
+            };
+        }
+        
         setDynPlans(
             newDynPlans
         );

@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["omitApi"]
 }
 
@@ -16,7 +16,7 @@ model User {
   name      String   @unique
   passhash  String?
   recipes   Recipe[] @relation(name: "creator")
-  favorites Recipe[] @relation(name: "favoritedBy") 
+  favorites Recipe[] @relation(name: "favoritedBy")
   plans     Plan[]
 }
 
@@ -24,7 +24,6 @@ model Recipe {
   id           Int               @id @default(autoincrement())
   creator      User              @relation(name: "creator", fields: [creatorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   favoritedBy  User[]            @relation(name: "favoritedBy")
-  inDay        PlanDay[]
   creatorId    Int
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
@@ -33,6 +32,7 @@ model Recipe {
   videoFile    String?
   imageFile    String?
   ingredients  IngredientEntry[]
+  inQuantities RecipeQuantity[]
 }
 
 model IngredientEntry {
@@ -62,15 +62,24 @@ model Plan {
 }
 
 model PlanDay {
-  id      Int      @id @default(autoincrement())
-  dayName String
-  weekday Weekday  @relation(fields: [dayName], references: [name], onDelete: Cascade, onUpdate: Cascade)
-  planId  Int
-  inPlan  Plan     @relation(fields: [planId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  recipes Recipe[]
-// TODO: referential actions on plan days and weekdays and such.
-// Recipes being deleted should delete them in the meal plans 
+  id           Int              @id @default(autoincrement())
+  dayName      String
+  weekday      Weekday          @relation(fields: [dayName], references: [name], onDelete: Cascade, onUpdate: Cascade)
+  planId       Int
+  inPlan       Plan             @relation(fields: [planId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  quantRecipes RecipeQuantity[]
+
+  // TODO: referential actions on plan days and weekdays and such.
+  // Recipes being deleted should delete them in the meal plans 
   @@unique([planId, dayName], name: "noDuplicateDays")
+}
+
+model RecipeQuantity {
+  id       Int       @id @default(autoincrement())
+  quantity Int
+  recipeId Int
+  recipe   Recipe    @relation(fields: [recipeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  inDays   PlanDay[]
 }
 
 // Enum of SSMTWTF

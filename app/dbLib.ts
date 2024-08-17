@@ -61,7 +61,12 @@ export type DeepPlan = Prisma.PlanGetPayload<{
         days: {
             include: {
                 weekday: true,
-                recipes: true
+                quantRecipes: {
+                    include: {
+                        recipe: true,
+                        quantity: true
+                    }
+                }
             }
         }
     }
@@ -70,7 +75,11 @@ const deepPlanInclude = {
     days: {
         include: {
             weekday: true,
-            recipes: true
+            quantRecipes: {
+                include: {
+                    recipe: true
+                }
+            }
         }
     }
 }
@@ -90,8 +99,15 @@ export async function updatePlan(plan : DeepPlan) : Promise<void> {
                             name: day.dayName
                         }
                     },
-                    recipes: {
-                        connect: day.recipes
+                    quantRecipes: {
+                        create: day.quantRecipes.map((quantRecipe) => ({
+                            quantity: quantRecipe.quantity,
+                            recipe: {
+                                connect: {
+                                    id: quantRecipe.recipeId
+                                }
+                            }
+                        }))
                     }
                 }))
             }
@@ -110,7 +126,7 @@ export async function getMealPlans() : Promise<DeepPlan[]> {
     if(session == null){
         throw new Error("You are not logged in");
     }
-    // TODO: bug: this doesn't return the created plans on subsequent calls. Figure out why.
+
     const user = await prisma.user.findUnique({
         where: {
             id: +session.user.id
