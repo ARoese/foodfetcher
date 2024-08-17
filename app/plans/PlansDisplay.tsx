@@ -1,6 +1,4 @@
 "use client";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PlanContainer from "./PlanContainer";
 import { useState } from "react";
 import { Plan, Recipe } from "@prisma/client"
@@ -8,11 +6,13 @@ import { DeepPlan, deleteMealPlan, newMealPlan, updatePlan } from "../dbLib";
 import { toast } from "react-toastify";
 import DraggableRecipeList from "./DraggableRecipeList";
 import Select from 'react-select';
+import {default as CreatableSelect} from 'react-select/creatable';
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import RecipeSmallItem from "../browse/RecipeSmallItem";
 const deepEqual = require("deep-equal");
 
 type args = {plans : DeepPlan[], userId : number, favorites : Recipe[], ownRecipes : Recipe[]};
+// TODO: clean this up and modularize stuff
 function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
     const sourceGroups = [
         {value: favorites, label: "Favorites"},
@@ -20,12 +20,19 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
     ]
     const [editing, setEditing] = useState(false);
     const [dynPlans, setDynPlans] = useState(plans);
+    const dynPlansOptions = dynPlans.map(
+        (plan, i) => ({value: i, label: plan.name})
+    );
     const [recipeSource, setRecipeSource] = useState(sourceGroups[0]);
+    const [planIndex, setPlanIndex] = useState(dynPlansOptions.length != 0 ? dynPlansOptions[0] : null);
+    if(planIndex != null && (planIndex.value < 0 || planIndex.value >= dynPlansOptions.length)){
+        setPlanIndex(dynPlansOptions.length != 0 ? dynPlansOptions[0] : null);
+    }
     const [draggingRecipe, setDraggingRecipe] = useState(null);
     //console.log(favorites, ownRecipes);
 
     
-    async function addPlan(){
+    async function addPlan(name : string){
         // this makes a new plan in the database
         // eagerly--it doesn't wait for everything to be done
         // before making the push to db
@@ -33,7 +40,7 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
         setDynPlans(
             [
                 ...dynPlans, 
-                await newMealPlan(userId)
+                await newMealPlan(userId, name)
             ]
         );
     }
@@ -53,12 +60,12 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
             success: "Deleted plan",
             error: "Failed to delete plan"
         });
-        
     }
 
     function makeUpdatePlan(i : number) : (plan : DeepPlan) => void{
         // return a closure around setDynPlans with the index pre-set
         return (plan : DeepPlan) => {
+            setPlanIndex({...planIndex, label: plan.name});
             setDynPlans(dynPlans.with(i, plan));
         }
     }
@@ -145,57 +152,49 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
                 : ""
             }
         </DragOverlay>
-        <button onClick={onClickEdit}>{editing ? "Save" : "Edit"}</button>
+        
+        <div className="mx-auto flex flex-row relative m-2">
+            <CreatableSelect
+                onChange={setPlanIndex}
+                value={planIndex}
+                className="w-fit min-w-64 mx-auto" 
+                options={dynPlansOptions}
+                onCreateOption={async (n) => {
+                    await addPlan(n);
+                    setEditing(true);
+                    setPlanIndex({value: dynPlansOptions.length, label: n});
+                    }
+                }
+                createOptionPosition="last"
+            />
+            <button className="absolute left-0" onClick={onClickEdit}>{editing ? "Save" : "Edit"}</button>
+            {
+                editing && 
+                <button className="text-red-700 absolute right-0" onClick={async () => await deletePlan(planIndex.value)}>Delete</button>
+            }
+        </div>
+        
+        {
+            <div className="flex flex-col">
+                {
+                    planIndex != null && 
+                    <PlanContainer plan={dynPlans[planIndex.value]} editing={editing} setPlan={makeUpdatePlan(planIndex.value)}/>
+                }
+            </div>
+        }
+
         {
             editing && 
             <>
             <h2>Select a recipes list:</h2>
             <Select 
                 isSearchable={false}
-                onChange={(newVal) => setRecipeSource(newVal)} 
+                onChange={setRecipeSource} 
                 value={recipeSource} 
                 className="w-fit mx-auto" 
                 options={sourceGroups}/>
             <DraggableRecipeList recipes={recipeSource.value}/>
             </>
-        }
-        
-        {
-            dynPlans.map(
-                (plan, i) => (
-                    <>
-                    <div key={plan.id} className="flex flex-col">
-                        {
-                            editing 
-                            ? <button className="w-auto" onClick={async () => await deletePlan(i)}>Delete</button>
-                            : ""
-                        }
-                        {/* TODO: accordian these */}
-                        <PlanContainer plan={plan} editing={editing} setPlan={makeUpdatePlan(i)}/>
-                        
-                    </div>
-                    
-                    </>
-                )
-            )
-        }
-        {
-            /* 
-                If there are no plans, allow the add button to appear. When it is clicked,
-                go into edit mode 
-            */
-            editing || dynPlans.length < 1
-            ? <button 
-                className="w-full" 
-                onClick={
-                    dynPlans.length > 0
-                    ? async () => await addPlan()
-                    : async () => {await addPlan(); setEditing(true)}
-                    
-                }>
-                <FontAwesomeIcon icon={faPlus} />
-            </button>
-            : ""
         }
         </DndContext>
     );

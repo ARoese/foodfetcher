@@ -136,7 +136,10 @@ export async function getMealPlans() : Promise<DeepPlan[]> {
         },
         include: {
             plans: {
-                include: deepPlanInclude
+                include: deepPlanInclude,
+                orderBy: {
+                    id: "asc"
+                }
             }
         }
     });
@@ -147,11 +150,11 @@ export async function getMealPlans() : Promise<DeepPlan[]> {
     return user.plans;
 }
 
-export async function newMealPlan(userId : number) : Promise<DeepPlan> {
+export async function newMealPlan(userId : number, name : string) : Promise<DeepPlan> {
     // TODO: protect this
     const newPlan = await prisma.plan.create({
         data: {
-            name: "New Meal Plan",
+            name: name,
             days: {
                 // always make a relational for each day in the week
                 createMany: {

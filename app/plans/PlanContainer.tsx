@@ -33,7 +33,7 @@ function Plan({plan, setPlan, editing} : args) {
         {
             editing
             ? <input className="text-center mx-auto" value={plan.name} onChange={onEditName}/>
-            : <h2>{plan.name}</h2>
+            : ""
         }
         <div className="flex flex-row">
             {
