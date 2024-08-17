@@ -13,7 +13,7 @@ import RecipeSmallItem from "../browse/RecipeSmallItem";
 const deepEqual = require("deep-equal");
 
 type args = {plans : DeepPlan[], userId : number, favorites : Recipe[], ownRecipes : Recipe[]};
-function PlanDisplay({plans, userId, favorites, ownRecipes} : args) {
+function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
     const sourceGroups = [
         {value: favorites, label: "Favorites"},
         {value: ownRecipes, label: "Owned"}
@@ -107,6 +107,8 @@ function PlanDisplay({plans, userId, favorites, ownRecipes} : args) {
         
         if(toUpdate.length == 0){
             toast.info("No changes to save");
+            setEditing(false);
+            return;
         }
 
         const updatingPromise = Promise.all(toUpdate.map(updatePlan));
@@ -115,11 +117,13 @@ function PlanDisplay({plans, userId, favorites, ownRecipes} : args) {
             pending: `Updating ${toUpdate.length} plans...`,
             error: {
                 render: (e) => {
+                    const error = e.data as Error;
+                    console.log(e);
                     wasError = true;
-                    return "Failed to save plans";
+                    return `Failed to save plans: ${error.message}`;
                 }
             },
-            success: "Changes saved"
+            success: `Updated ${toUpdate.length} plan${toUpdate.length > 1 ? "s" : ""}.`
         });
 
         if(wasError){
@@ -142,7 +146,7 @@ function PlanDisplay({plans, userId, favorites, ownRecipes} : args) {
             }
         </DragOverlay>
         <button onClick={onClickEdit}>{editing ? "Save" : "Edit"}</button>
-        { /* TODO: hide if empty */
+        {
             editing && 
             <>
             <h2>Select a recipes list:</h2>
@@ -161,7 +165,6 @@ function PlanDisplay({plans, userId, favorites, ownRecipes} : args) {
                 (plan, i) => (
                     <>
                     <div key={plan.id} className="flex flex-col">
-                        <h2>{plan.name}</h2>
                         {
                             editing 
                             ? <button className="w-auto" onClick={async () => await deletePlan(i)}>Delete</button>
@@ -198,4 +201,4 @@ function PlanDisplay({plans, userId, favorites, ownRecipes} : args) {
     );
 }
 
-export default PlanDisplay;
+export default PlansDisplay;

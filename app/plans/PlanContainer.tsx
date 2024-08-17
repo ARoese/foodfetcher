@@ -2,6 +2,7 @@
 import type {DeepPlan} from "@/app/dbLib"
 import DayContainer from "./DayContainer";
 import { Recipe } from "@prisma/client";
+import { ChangeEventHandler } from "react";
 
 export type DeepPlanDay = DeepPlan["days"][number];
 type args = {plan : DeepPlan, editing : boolean, setPlan : (plan : DeepPlan) => void}
@@ -19,9 +20,21 @@ function Plan({plan, setPlan, editing} : args) {
             });
         }
     }
+
+    const onEditName : ChangeEventHandler<HTMLInputElement> = (e) => {
+        setPlan({
+            ...plan,
+            name: e.target.value
+        });
+    }
+
     return ( 
         <>
-        {/* <h1>{plan.name}</h1> */}
+        {
+            editing
+            ? <input className="text-center mx-auto" value={plan.name} onChange={onEditName}/>
+            : <h2>{plan.name}</h2>
+        }
         <div className="flex flex-row">
             {
                 plan.days.map(

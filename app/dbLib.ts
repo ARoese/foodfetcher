@@ -85,6 +85,9 @@ const deepPlanInclude = {
 }
 
 export async function updatePlan(plan : DeepPlan) : Promise<void> {
+    if(!plan.name.trim()){
+        throw new Error("Plans cannot have empty names.");
+    }
     await prisma.plan.update({
         where: {
             id: plan.id
