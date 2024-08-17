@@ -140,12 +140,14 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
         setEditing(false);
     }
 
+    console.log(draggingRecipe);
+
     return ( 
         <DndContext autoScroll={false}
-            onDragStart={(event) => {setDraggingRecipe(event.active.data); console.log(event.active.data)}}
+            onDragStart={(event) => {setDraggingRecipe(event.active.data.current)}}
             onDragEnd={handleDragEnd}
         >
-        <DragOverlay dropAnimation={{duration: 500}}>
+        <DragOverlay dropAnimation={null} >
             {
                 draggingRecipe
                 ? <RecipeSmallItem className="max-w-40 min-w-40 mx-2" recipe={draggingRecipe}/>
