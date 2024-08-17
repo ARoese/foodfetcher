@@ -32,7 +32,7 @@
     "**/*.ts",
     "**/*.tsx",
     "auth.ts"
-  ],
+, "app/recipeUtil.tss"  ],
   "exclude": [
     "node_modules"
   ]

@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import {deleteRecipe, setFavorite, updateRecipe} from "@/app/dbLib"
-import recipeImage from "@/public/images/logo.png";
 import { useState } from "react";
 import { IngredientEntry, PrismaClient, type Prisma } from "@prisma/client";
 import { useRouter } from 'next/navigation'
@@ -20,6 +19,9 @@ type RecipeWithRelations = Prisma.RecipeGetPayload<{
 import ReactTextareaAutosize from "react-textarea-autosize";
 import IngredientsDisplay from "./IngredientsDisplay";
 import BulkIngredientEditor from "./BulkIngredientEditor";
+import { FileUploader } from "react-drag-drop-files";
+import { setMedia } from "@/app/fsLib";
+import recipeImageJsx from "@/app/recipeUtil";
 
 type args = {
     recipe: RecipeWithRelations,
@@ -103,6 +105,19 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorite
         setFavorited(!favorited);
     }
 
+    async function handleImageUpload(file : File){
+        console.log(file);
+        const d = new FormData();
+        d.append("image", file);
+        const remoteName = await setMedia(file.name, "image", d);
+        setDynRecipe({
+            ...dynRecipe,
+            imageFile: remoteName
+        });
+    }
+
+    //console.log(dynRecipe.imageFile);
+    
     return ( 
         <>
         {
@@ -141,7 +156,22 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorite
         <h2>{dynRecipe.creator.name}</h2>
         <h2>{dynRecipe.updatedAt ? dynRecipe.updatedAt.toISOString() : ""}</h2>
         <div className="flex flex-row">
-            <Image className="w-2/5 h-fit" width="0" height="0" src={recipeImage} alt="Recipe cover image"/>
+            <div className="w-2/5 h-fit">
+            {
+                beingEdited
+                ? (
+                    <FileUploader 
+                        label="Drop an image here"
+                        hoverTitle="Drop here"
+                        onDrop={handleImageUpload}
+                        onSelect={handleImageUpload}
+                    >
+                            {recipeImageJsx(dynRecipe)}
+                    </FileUploader>
+                ) : recipeImageJsx(dynRecipe)
+            }
+            </div>
+            
             <div className="flex flex-col w-full">
                 <div>
                     <h3>Ingredients</h3>

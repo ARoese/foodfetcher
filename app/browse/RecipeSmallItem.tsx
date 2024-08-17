@@ -4,6 +4,7 @@ import recipeImage from "@/public/images/logo.png";
 import Link from "next/link";
 import { MouseEventHandler } from "react";
 import { Recipe } from "@prisma/client";
+import recipeImageJsx from "../recipeUtil";
 
 type args = {recipe : Recipe, className?: string, newTab?: boolean, onClick?: () => void | null}
 function RecipeSmallItem({recipe, className = "", onClick = null, newTab = false} : args) {
@@ -26,7 +27,7 @@ function RecipeSmallItem({recipe, className = "", onClick = null, newTab = false
         // for navs to this page. https://github.com/vercel/next.js/discussions/54075
         <div className={className}>
             <a href={`/recipe/${recipe.id}`} onClick={onAnchor} target={newTab ? "_blank" : "_self"}>
-                <Image width="0" height="0" src={recipeImage} alt="Recipe cover image"/>
+                {recipeImageJsx(recipe)}
                 <p className="text-center">{recipe.name}</p>
             </a>
         </div>
