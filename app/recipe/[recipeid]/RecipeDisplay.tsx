@@ -116,6 +116,17 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorite
         });
     }
 
+    async function handleVideoUpload(file : File){
+        console.log(file);
+        const d = new FormData();
+        d.append("video", file);
+        const remoteName = await setMedia(file.name, "video", d);
+        setDynRecipe({
+            ...dynRecipe,
+            videoFile: remoteName
+        });
+    }
+
     //console.log(dynRecipe.imageFile);
     
     return ( 
@@ -160,6 +171,7 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorite
             {
                 beingEdited
                 ? (
+                    <>
                     <FileUploader 
                         label="Drop an image here"
                         hoverTitle="Drop here"
@@ -168,7 +180,35 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorite
                     >
                             {recipeImageJsx(dynRecipe)}
                     </FileUploader>
-                ) : recipeImageJsx(dynRecipe)
+                    <FileUploader
+                        label="Drop a video here"
+                        hoverTitle="Drop here"
+                        onDrop={handleVideoUpload}
+                        onSelect={handleVideoUpload}
+                    >
+                    { // Same thing but without controls. This allows a click without play
+                        dynRecipe.videoFile 
+                        ? <video className="max-w-fit" src={`/media/video/${dynRecipe.videoFile}`}>
+                            Your browser does not support the video tag
+                        </video>
+                        : <div className="min-w-fit min-h-60 bg-gray-400">
+                            <p className="my-auto">Drop a video file here</p>
+                        </div>
+                    }
+                    </FileUploader>
+                    </>
+                ) : (
+                    <>
+                    {recipeImageJsx(dynRecipe)}
+                    {
+                        dynRecipe.videoFile &&
+                        <video controls className="max-w-fit" src={`/media/video/${dynRecipe.videoFile}`}>
+                            Your browser does not support the video tag
+                        </video>
+                    }
+                    </>
+                    
+                )
             }
             </div>
             

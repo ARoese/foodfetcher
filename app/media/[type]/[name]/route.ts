@@ -29,7 +29,6 @@ export async function GET(request : Request, { params } : {params: {type : "vide
         return response404;
     }
     
-
     const fileStream = await getMedia(name, type);
     console.log(fileStream);
     if(fileStream == null){
@@ -37,8 +36,6 @@ export async function GET(request : Request, { params } : {params: {type : "vide
             ? NextResponse.redirect(defaultLogoPath) 
             : response404;
     }
-
-    console.log("gotThere");
 
     return new NextResponse(streamFile(fileStream), {status: 200, statusText: "OK"});
 }

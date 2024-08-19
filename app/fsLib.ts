@@ -12,7 +12,7 @@ function hashName(name : string) : string {
     const hash = createHash("sha1")
         .update(nowMs.toString())
         .update(name.toString())
-        .digest('base64')
+        .digest('base64url')
         .slice(0, 15); // max 15 characters
     const parts = name.split('.');
     return hash + "." + parts[parts.length-1];
@@ -61,7 +61,7 @@ export async function setMedia(name : string, type : "video" | "image", form : F
     }else{
         const hashedName = hashName(name);
         const fp = fullPath(hashedName, type);
-        const file = form.get("image") as File;
+        const file = form.get(type) as File;
         //fs.writeFileSync(fp, file.arrayBuffer())
         const outStream = fs.createWriteStream(fp);
         readableStreamToReadStream(file.stream()).pipe(outStream);
