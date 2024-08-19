@@ -22,6 +22,7 @@ import BulkIngredientEditor from "./BulkIngredientEditor";
 import { FileUploader } from "react-drag-drop-files";
 import { setMedia } from "@/app/fsLib";
 import recipeImageJsx from "@/app/recipeUtil";
+import UploadCover from "./UploadCover";
 
 type args = {
     recipe: RecipeWithRelations,
@@ -128,7 +129,7 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorite
     }
 
     //console.log(dynRecipe.imageFile);
-    
+    // TODO: break this out into some sub-components
     return ( 
         <>
         {
@@ -175,26 +176,36 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorite
                     <FileUploader 
                         label="Drop an image here"
                         hoverTitle="Drop here"
-                        onDrop={handleImageUpload}
-                        onSelect={handleImageUpload}
+                        handleChange={handleImageUpload}
                     >
+                        <div className="relative">
                             {recipeImageJsx(dynRecipe)}
+                            <UploadCover 
+                                text={"Upload Recipe Image"}
+                                className="absolute inset-0 bg-white bg-opacity-60"
+                            />
+                        </div>
                     </FileUploader>
                     <FileUploader
                         label="Drop a video here"
                         hoverTitle="Drop here"
-                        onDrop={handleVideoUpload}
-                        onSelect={handleVideoUpload}
+                        handleChange={handleVideoUpload}
                     >
-                    { // Same thing but without controls. This allows a click without play
-                        dynRecipe.videoFile 
-                        ? <video className="max-w-fit" src={`/media/video/${dynRecipe.videoFile}`}>
-                            Your browser does not support the video tag
-                        </video>
-                        : <div className="min-w-fit min-h-60 bg-gray-400">
-                            <p className="my-auto">Drop a video file here</p>
+                        <div className="relative">
+                            { // Same thing but without controls. This allows a click without play
+                                dynRecipe.videoFile 
+                                ? <video className="max-w-fit" src={`/media/video/${dynRecipe.videoFile}`}>
+                                    Your browser does not support the video tag
+                                </video>
+                                : <div className="min-w-fit min-h-60 bg-gray-400">
+                                    <p className="my-auto">Drop a video file here</p>
+                                </div>
+                            }
+                            <UploadCover 
+                                text={"Upload Recipe Video"}
+                                className="absolute inset-0 bg-white bg-opacity-60"
+                            />
                         </div>
-                    }
                     </FileUploader>
                     </>
                 ) : (

@@ -13,7 +13,7 @@ function hashName(name : string) : string {
         .update(nowMs.toString())
         .update(name.toString())
         .digest('base64url')
-        .slice(0, 15); // max 15 characters
+        .slice(0, 16); // max 16 characters
     const parts = name.split('.');
     return hash + "." + parts[parts.length-1];
 }
