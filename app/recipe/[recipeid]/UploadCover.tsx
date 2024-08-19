@@ -6,6 +6,7 @@ function UploadCover({ text, className = "" }) {
             <div className="text-center">
                 <FontAwesomeIcon size={"4x"} icon={faUpload} className="mb-2" />
                 <p>{text}</p>
+                <p>(Click or Drag)</p>
             </div>
         </div>
     );

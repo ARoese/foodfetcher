@@ -30,7 +30,7 @@ export async function GET(request : Request, { params } : {params: {type : "vide
     }
     
     const fileStream = await getMedia(name, type);
-    console.log(fileStream);
+    //console.log(fileStream);
     if(fileStream == null){
         return type == "image" 
             ? NextResponse.redirect(defaultLogoPath) 

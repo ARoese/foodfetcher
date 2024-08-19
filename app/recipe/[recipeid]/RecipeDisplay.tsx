@@ -175,26 +175,24 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorite
                     <>
                     <FileUploader 
                         label="Drop an image here"
-                        hoverTitle="Drop here"
                         handleChange={handleImageUpload}
                     >
                         <div className="relative">
                             {recipeImageJsx(dynRecipe)}
                             <UploadCover 
-                                text={"Upload Recipe Image"}
+                                text={"Upload recipe image"}
                                 className="absolute inset-0 bg-white bg-opacity-60"
                             />
                         </div>
                     </FileUploader>
                     <FileUploader
                         label="Drop a video here"
-                        hoverTitle="Drop here"
                         handleChange={handleVideoUpload}
                     >
                         <div className="relative">
                             { // Same thing but without controls. This allows a click without play
                                 dynRecipe.videoFile 
-                                ? <video className="max-w-fit" src={`/media/video/${dynRecipe.videoFile}`}>
+                                ? <video width="100%" className="max-w-fit" src={`/media/video/${dynRecipe.videoFile}`}>
                                     Your browser does not support the video tag
                                 </video>
                                 : <div className="min-w-fit min-h-60 bg-gray-400">
@@ -202,7 +200,7 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorite
                                 </div>
                             }
                             <UploadCover 
-                                text={"Upload Recipe Video"}
+                                text={"Upload recipe video"}
                                 className="absolute inset-0 bg-white bg-opacity-60"
                             />
                         </div>
@@ -213,7 +211,7 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorite
                     {recipeImageJsx(dynRecipe)}
                     {
                         dynRecipe.videoFile &&
-                        <video controls className="max-w-fit" src={`/media/video/${dynRecipe.videoFile}`}>
+                        <video controls width="100%" className="max-w-fit" src={`/media/video/${dynRecipe.videoFile}`}>
                             Your browser does not support the video tag
                         </video>
                     }
