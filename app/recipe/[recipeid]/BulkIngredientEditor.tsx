@@ -31,7 +31,7 @@ function BulkIngredientEditor({display, ingredients, setIngredients} : args) {
     }
 
     function updateBulk(){
-        if(!window.confirm("Warning: this will overwrite all current recipes. Continue?")){
+        if(!window.confirm("Warning: this will overwrite all current ingredients. Continue?")){
             return;
         }
         const parsed = parseIngredient(bulkEditText)

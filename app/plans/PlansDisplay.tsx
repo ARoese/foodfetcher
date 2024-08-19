@@ -46,6 +46,10 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
     }
 
     async function deletePlan(i : number){
+        if(!window.confirm(`Delete '${dynPlans[i].name}'?`)){
+            return;
+        }
+
         async function tryDelete(){
             await deleteMealPlan(dynPlans[i].id);
             // only update here on the client when we're sure the
