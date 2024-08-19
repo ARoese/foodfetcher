@@ -16,7 +16,7 @@ export default function Home() {
 	return (
 		<>
 			<div id = "background"></div>
-			{/* TODO: add in nav bar */}
+			{/* TODO: get this page re-written reasonably */}
 			<div id="landing">
 				<div id="intro">
 					<p id="title">
@@ -27,7 +27,6 @@ export default function Home() {
 					<p id="sub-title">
 						<i>The Meal Planner Made For You</i>
 					</p>
-					{/* TODO: add in login/register in nav bar */}
 				</div>
 			</div>
 			<div id="border-line" style={{height: "1.5vh", backgroundColor: "var(--green)"}}></div>

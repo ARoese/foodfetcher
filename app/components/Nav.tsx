@@ -4,6 +4,7 @@ import Image from "next/image";
 import LogOutButton from "./LogOutButton";
 import { auth } from "@/auth";
 import LogInButton from "./LogInButton";
+import NavLink from "./NavLink";
 
 export default async function Nav(){
     const session = await auth();
@@ -12,36 +13,29 @@ export default async function Nav(){
     //console.log(session);
     return (
         <>
-            <nav id="navbar">
-                <div id = "header">
-                    <Link href="/">
-                        <div id = "logo">
-                            <Image src={logoDark} width="0" height="0" alt="Food Fetcher Logo" />
+            <nav className="flex flex-row h-full text-center overflow-hidden bg-white px-2">
+                <Link href="/" className="mr-auto">
+                    <Image src={logoDark} className="h-20 w-auto" alt="Food Fetcher Logo" />
+                </Link>
+                <NavLink href="/">Home</NavLink>
+                <NavLink href="/browse">Browse Recipes</NavLink>
+                <NavLink href="/recipe/create">Create Recipe</NavLink>
+                <NavLink href="/plans">Meal Plans</NavLink>
+                {
+                    isLoggedIn ? (
+                    <>
+                        <div id='logout'>
+                            Hello, <Link href="/account">{session.user.name}</Link><br/>
+                            <LogOutButton/><br/>
                         </div>
-                    </Link>
-                    <div id = "nav">
-                        <Link href="/">Home</Link>
-                        <Link href="/browse">Browse Recipes</Link>
-                        <Link href="/recipe/create">Create Recipe</Link>
-                        <Link href="/plans">Meal Plans</Link>
-                        {
-                            isLoggedIn ? (
-                            <>
-                                <div id='logout'>
-                                    Hello, <Link href="/account">{session.user.name}</Link><br/>
-                                    <LogOutButton/><br/>
-                                </div>
-                            </>
-                            ) : (
-                            <>  
-                                <LogInButton/>
-                                <Link id='/signup' href="signup">Sign Up</Link>
-                            </>
-                            )
-                        }
-                        
-                    </div>
-                </div>
+                    </>
+                    ) : (
+                    <>  
+                        <LogInButton/>
+                        <Link id='/signup' href="signup">Sign Up</Link>
+                    </>
+                    )
+                }
             </nav>
         </>
     );
