@@ -71,6 +71,7 @@ export type DeepPlan = Prisma.PlanGetPayload<{
         }
     }
 }>;
+
 const deepPlanInclude = {
     days: {
         include: {
@@ -78,6 +79,44 @@ const deepPlanInclude = {
             quantRecipes: {
                 include: {
                     recipe: true
+                }
+            }
+        }
+    }
+}
+
+// make sure these two match
+export type FullPlan = Prisma.PlanGetPayload<{
+    include: {
+        days: {
+            include: {
+                weekday: true,
+                quantRecipes: {
+                    include: {
+                        recipe: {
+                            include: {
+                                ingredients: true
+                            }
+                        },
+                        quantity: true
+                    }
+                }
+            }
+        }
+    }
+}>;
+
+const fullPlanInclude = {
+    days: {
+        include: {
+            weekday: true,
+            quantRecipes: {
+                include: {
+                    recipe: {
+                        include: {
+                            ingredients: true
+                        }
+                    }
                 }
             }
         }
@@ -122,6 +161,25 @@ function sortPlanDays(plan : DeepPlan){
     // sort the days by their names so that the days are in 
     // the same order as they appear in this global DAYS array
     plan.days.sort((a, b) => DAYS.indexOf(a.dayName) - DAYS.indexOf(b.dayName));
+}
+
+export async function getMealPlan(planid : number) : Promise<FullPlan|null>{
+    const session = await auth();
+    if(session == null){
+        throw new Error("You are not logged in");
+    }
+
+    const plan = await prisma.plan.findUnique({
+        where: {
+            id: planid,
+            owningUserId: +session.user.id
+        },
+        include: fullPlanInclude
+    });
+
+    sortPlanDays(plan);
+
+    return plan;
 }
 
 export async function getMealPlans() : Promise<DeepPlan[]> {

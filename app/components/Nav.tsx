@@ -13,7 +13,7 @@ export default async function Nav(){
     //console.log(session);
     return (
         <>
-            <nav className="flex flex-row h-full text-center overflow-hidden bg-white px-2">
+            <nav className="flex flex-row h-full text-center overflow-x-scroll bg-white px-2">
                 <Link href="/" className="mr-auto">
                     <Image src={logoDark} className="h-20 w-auto" alt="Food Fetcher Logo" />
                 </Link>

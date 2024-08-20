@@ -9,6 +9,7 @@ import Select from 'react-select';
 import {default as CreatableSelect} from 'react-select/creatable';
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import RecipeSmallItem from "../browse/RecipeSmallItem";
+import Link from "next/link";
 const deepEqual = require("deep-equal");
 
 type args = {plans : DeepPlan[], userId : number, favorites : Recipe[], ownRecipes : Recipe[]};
@@ -175,8 +176,9 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
             />
             <button className="absolute left-0" onClick={onClickEdit}>{editing ? "Save" : "Edit"}</button>
             {
-                editing && 
-                <button className="text-red-700 absolute right-0" onClick={async () => await deletePlan(planIndex.value)}>Delete</button>
+                editing
+                ? <button className="text-red-700 absolute right-0" onClick={async () => await deletePlan(planIndex.value)}>Delete</button>
+                : <Link href={`/plans/${dynPlans[planIndex.value].id}/print`}><button className="absolute right-0">Collect Ingredients</button></Link>
             }
         </div>
         

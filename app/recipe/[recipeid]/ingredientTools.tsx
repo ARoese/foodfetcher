@@ -1,9 +1,19 @@
 import { Ingredient, IngredientEntry } from "@prisma/client";
 import { Ingredient as ParsedIngredient, parseIngredient } from "parse-ingredient";
 
+/** words that should never be interpreted to be units of measure */ 
+const falseUOMs = [
+    "tiny", "small", "medium", 
+    "normal", "average", "large", 
+    "big", "huge", "ginormous", 
+    "humongous"
+]
+
 export function tryParseIngredient(ingredientText : string) : {valid: boolean, parsed: ParsedIngredient}
 {
-    const parsed = parseIngredient(ingredientText);
+    const parsed = parseIngredient(ingredientText, {
+        ignoreUOMs: falseUOMs
+    });
     return {
          valid: parsed.length == 1 && isParsedIngredientValid(parsed[0]),
          parsed: parsed[0]
