@@ -6,7 +6,7 @@ import RecipeDisplay from "./RecipeDisplay";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { signIn } from "next-auth/react";
-import { hasFavorited } from "@/app/dbLib";
+import { hasFavorited } from "@/lib/db/favorites";
 
 const prisma = new PrismaClient();
 

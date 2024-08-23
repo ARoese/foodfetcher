@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, MouseEventHandler } from "react";
 import RecipesDisplay from "./RecipesDisplay";
-import {getRecipes} from "../dbLib";
+import {getRecipes} from "../../lib/db/recipes";
 
 const defaultRecipes = require("../api/recipes/defaultRecipes.json");
 const RECIPES_PER_PAGE = 12;

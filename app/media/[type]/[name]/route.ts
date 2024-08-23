@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import defaultLogo from "@/public/images/logo.png";
-import { getMedia } from "@/app/fsLib";
+import { getMedia } from "@/lib/media";
 import { ReadStream } from "fs";
 import { ReadableOptions } from "stream";
 

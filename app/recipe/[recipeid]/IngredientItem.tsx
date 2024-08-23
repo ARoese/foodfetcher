@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { IngredientEntry } from "@prisma/client";
 import { useState } from "react";
 import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
-import { parsedIngredientToIngredientEntry, toIngredientTextGroups, tryParseIngredient } from "./ingredientTools";
+import { parsedIngredientToIngredientEntry, toIngredientTextGroups, tryParseIngredient } from "../../../lib/ingredientTools";
 
 
 type args = {ingredient: IngredientEntry, beingEdited : boolean, setIngredient : (ing : IngredientEntry) => void};

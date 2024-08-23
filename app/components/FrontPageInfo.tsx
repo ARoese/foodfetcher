@@ -58,6 +58,7 @@ export default function FrontPageInfo(){
             </div>
             <Image 
                 id="plate1"
+                // @ts-ignore
                 height="100%"
                 alt="Image of a plate"
                 src={plate1}

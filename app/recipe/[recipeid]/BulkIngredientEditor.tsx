@@ -3,7 +3,7 @@ import {faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import Collapsible from "react-collapsible";
 import ReactTextareaAutosize from "react-textarea-autosize";
-import { ingredientsToText, isParsedIngredientValid, parsedIngredientToIngredientEntry } from "./ingredientTools";
+import { ingredientsToText, isParsedIngredientValid, parsedIngredientToIngredientEntry } from "../../../lib/ingredientTools";
 import { IngredientEntry } from "@prisma/client";
 import { parseIngredient } from "parse-ingredient";
 

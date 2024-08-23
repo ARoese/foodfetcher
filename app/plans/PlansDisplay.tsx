@@ -2,7 +2,6 @@
 import PlanContainer from "./PlanContainer";
 import { useState } from "react";
 import { Plan, Recipe } from "@prisma/client"
-import { DeepPlan, deleteMealPlan, newMealPlan, updatePlan } from "../dbLib";
 import { toast } from "react-toastify";
 import DraggableRecipeList from "./DraggableRecipeList";
 import Select from 'react-select';
@@ -10,6 +9,7 @@ import {default as CreatableSelect} from 'react-select/creatable';
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import RecipeSmallItem from "../browse/RecipeSmallItem";
 import Link from "next/link";
+import { DeepPlan, newMealPlan, deleteMealPlan, updatePlan } from "@/lib/db/plans";
 const deepEqual = require("deep-equal");
 
 type args = {plans : DeepPlan[], userId : number, favorites : Recipe[], ownRecipes : Recipe[]};

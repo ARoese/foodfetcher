@@ -1,5 +1,5 @@
 import SmallPageContainer from "@/app/components/SmallPageContainer";
-import { getMealPlan } from "@/app/dbLib";
+import { getMealPlan } from "@/lib/db/plans";
 import { notFound } from "next/navigation";
 import AggregatedPlan from "./AggregatedPlan";
 

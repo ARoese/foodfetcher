@@ -2,10 +2,12 @@
 
 import SmallPageContainer from "../components/SmallPageContainer";
 import { auth, signIn } from "@/auth";
-import { getFavorites, getMealPlans, getOwnRecipes } from "../dbLib";
 import PlansDisplay from "./PlansDisplay";
 import DraggableRecipeList from "./DraggableRecipeList";
 import { DndContext } from "@dnd-kit/core";
+import { getFavorites } from "@/lib/db/favorites";
+import { getMealPlans } from "@/lib/db/plans";
+import { getOwnRecipes } from "@/lib/db/recipes";
 
 export async function generateMetadata() {
     return {

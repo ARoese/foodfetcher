@@ -1,4 +1,4 @@
-import { FullPlan } from "@/app/dbLib";
+import { FullPlan } from "@/lib/db/plans";
 import configureMeasurements from "convert-units"
 import allMeasures from "convert-units/definitions/all"
 const convert = configureMeasurements(allMeasures);

@@ -2,7 +2,7 @@
 
 import { User } from "@prisma/client";
 import { useState } from "react";
-import { updateUser } from "../dbLib";
+import { updateUser } from "../../lib/db/user";
 import { toast } from "react-toastify";
 
 type Without<T, K> = Pick<T, Exclude<keyof T, K>>;

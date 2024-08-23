@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import {deleteRecipe, setFavorite, updateRecipe} from "@/app/dbLib"
 import { useState } from "react";
 import { IngredientEntry, PrismaClient, type Prisma } from "@prisma/client";
 import { useRouter } from 'next/navigation'
@@ -20,9 +19,11 @@ import ReactTextareaAutosize from "react-textarea-autosize";
 import IngredientsDisplay from "./IngredientsDisplay";
 import BulkIngredientEditor from "./BulkIngredientEditor";
 import { FileUploader } from "react-drag-drop-files";
-import { setMedia } from "@/app/fsLib";
+import { setMedia } from "@/lib/media";
 import recipeImageJsx from "@/app/recipeUtil";
 import UploadCover from "./UploadCover";
+import { setFavorite } from "@/lib/db/favorites";
+import { updateRecipe, deleteRecipe } from "@/lib/db/recipes";
 
 type args = {
     recipe: RecipeWithRelations,

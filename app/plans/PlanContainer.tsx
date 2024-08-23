@@ -1,5 +1,5 @@
 "use client";
-import type {DeepPlan} from "@/app/dbLib"
+import type {DeepPlan} from "@/lib/db/plans"
 import DayContainer from "./DayContainer";
 import { Recipe } from "@prisma/client";
 import { ChangeEventHandler } from "react";

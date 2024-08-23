@@ -1,8 +1,8 @@
-import { FullPlan } from "@/app/dbLib";
-import { aggregateDays, toBestUnit } from "./aggregations";
+import { FullPlan } from "@/lib/db/plans";
+import { aggregateDays, toBestUnit } from "../../../../lib/ingredientAggregations";
 import { IngredientEntry } from "@prisma/client";
 import IngredientsDisplay from "@/app/recipe/[recipeid]/IngredientsDisplay";
-import { toIngredientTextGroups } from "@/app/recipe/[recipeid]/ingredientTools";
+import { toIngredientTextGroups } from "@/lib/ingredientTools";
 import { faSquare } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
