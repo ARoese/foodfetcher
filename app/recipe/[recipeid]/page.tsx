@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { signIn } from "next-auth/react";
 import { hasFavorited } from "@/lib/db/favorites";
+import { getCurrentUser, getCurrentUserOrLogin } from "@/lib/db/user";
 
 const prisma = new PrismaClient();
 
@@ -22,7 +23,6 @@ type RecipeWithRelations = Prisma.RecipeGetPayload<{
 }>
 
 export async function generateMetadata({params: {recipeid}}) : Promise<Metadata> {
-
     if(recipeid == "create"){
         return {
             title: "Food Fetchers | Create Recipe"
@@ -54,33 +54,11 @@ export async function generateMetadata({params: {recipeid}}) : Promise<Metadata>
     };
 }
 
-async function tryGetUser(){
-    const session = await auth();
-    if(!session){
-        return null;
-    }
-
-    const userId = Number(session.user.id);
-
-    return await prisma.user.findUnique({
-        where: {
-            id: userId
-        },
-        omit: { // do not get passhash and risk exposing it via errors
-            passhash: true,
-        }
-    });
-}
-
 async function RecipeDisplayPage({params: {recipeid}}) {
     
     let creating = false;
     let recipe : Recipe & {creator: {name: string}, ingredients: IngredientEntry[]} = undefined;
-    const currentUser = await tryGetUser();
-
-    if(recipeid == "create" && !currentUser){
-        signIn(); // no session but trying to create a recipe
-    }
+    const currentUser = await (recipeid == "create" ? getCurrentUserOrLogin() : getCurrentUser());
 
     if(recipeid == "create"){
         creating = true;
@@ -127,6 +105,7 @@ async function RecipeDisplayPage({params: {recipeid}}) {
 
     const canEdit = creating || currentUser !== null && recipe.creatorId == currentUser.id;
     const isFavorited = recipe.id ? await hasFavorited(recipe.id) : false;
+    const preferredSystem = currentUser?.preferredMeasureSystem ?? "imperial";
     return ( 
         <SmallPageContainer>
             <RecipeDisplay 
@@ -135,6 +114,9 @@ async function RecipeDisplayPage({params: {recipeid}}) {
                 canEdit={canEdit}
                 isFavorited={isFavorited}
                 isLoggedIn={Boolean(currentUser)}
+                // we know that this system coming from the database is a valid string
+                // @ts-ignore
+                preferredSystem={preferredSystem}
             />
         </SmallPageContainer>
      );

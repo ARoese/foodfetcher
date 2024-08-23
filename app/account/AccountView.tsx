@@ -2,24 +2,26 @@
 
 import { User } from "@prisma/client";
 import { useState } from "react";
-import { updateUser } from "../../lib/db/user";
+import { SafeUser, updateUser } from "../../lib/db/user";
 import { toast } from "react-toastify";
 
-type Without<T, K> = Pick<T, Exclude<keyof T, K>>;
 
-function AccountView({account} : {account : Without<User, "passhash">}) {
+
+function AccountView({account} : {account : SafeUser}) {
     const [editing, setEditing] = useState(false);
     const [changingPassword, setChangingPassword] = useState(false);
     const [userName, setUserName] = useState(account.name);
+    const [preferredSystem, setPreferredSystem] = useState(account.preferredMeasureSystem);
+    console.log(preferredSystem);
 
     async function doSave(e){
         if(!confirm("Are you sure you want to update your profile?")){
             return;
         }
 
-        console.log(e);
+        //console.log(e);
         const formProps = Object.fromEntries(e);
-        console.log(formProps);
+        //console.log(formProps);
         const newUser = userName;
         const currentPass = formProps.currentPass;
         const newPass = formProps.newPass;
@@ -29,7 +31,7 @@ function AccountView({account} : {account : Without<User, "passhash">}) {
             return;
         }
 
-        const updatePromise = updateUser(account.id, newUser, currentPass, newPass);
+        const updatePromise = updateUser(account.id, newUser, preferredSystem, currentPass, newPass);
         await toast.promise(updatePromise, {
             pending: "Updating your account information...",
             error: {
@@ -68,6 +70,16 @@ function AccountView({account} : {account : Without<User, "passhash">}) {
                             <input name="newUser" value={userName} onChange={(e) => setUserName(e.target.value)}/>
                         </label><br/>
                         <label>
+                            preferred measure system:<br/>
+                            <select 
+                                value={preferredSystem} 
+                                onChange={(e) => setPreferredSystem(e.target.value)}
+                            >
+                                <option value="imperial">imperial</option>
+                                <option value="metric">metric</option>
+                            </select>
+                        </label>
+                        <label>
                             current password:<br/>
                             <input name="currentPass" required={true} type="password"/>
                         </label><br/>
@@ -94,6 +106,7 @@ function AccountView({account} : {account : Without<User, "passhash">}) {
             ) : (
                 <>
                 <p>username:</p><p>{userName}</p>
+                <p>preferred measure system: {preferredSystem}</p>
                 </>
             )
         }

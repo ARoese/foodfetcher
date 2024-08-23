@@ -145,7 +145,7 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
         setEditing(false);
     }
 
-    console.log(draggingRecipe);
+    //console.log(draggingRecipe);
 
     return ( 
         <DndContext autoScroll={false}
@@ -178,18 +178,23 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
             {
                 editing
                 ? <button className="text-red-700 absolute right-0" onClick={async () => await deletePlan(planIndex.value)}>Delete</button>
-                : <Link href={`/plans/${dynPlans[planIndex.value].id}/print`}><button className="absolute right-0">Collect Ingredients</button></Link>
+                : (
+                    planIndex &&
+                    <Link href={`/plans/${dynPlans[planIndex.value].id}/print`}>
+                        <button className="absolute right-0">Collect Ingredients</button>
+                    </Link>
+                )
             }
         </div>
         
-        {
-            <div className="flex flex-col">
-                {
-                    planIndex != null && 
-                    <PlanContainer plan={dynPlans[planIndex.value]} editing={editing} setPlan={makeUpdatePlan(planIndex.value)}/>
-                }
-            </div>
-        }
+        
+        <div className="flex flex-col">
+            {
+                planIndex != null && 
+                <PlanContainer plan={dynPlans[planIndex.value]} editing={editing} setPlan={makeUpdatePlan(planIndex.value)}/>
+            }
+        </div>
+        
 
         {
             editing && 

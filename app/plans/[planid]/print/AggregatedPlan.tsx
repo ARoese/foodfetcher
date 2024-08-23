@@ -7,13 +7,13 @@ import { faSquare } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 
-function AggregatedPlan({plan} : {plan : FullPlan}) {
-    //allUnits.map((u) => console.log(u));
-    //console.log(allUnits);
-    //console.log(plan)
-    const aggregated : IngredientEntry[] = aggregateDays(plan.days).map(toBestUnit);
-    //console.log(aggregated);
-    const aggregatedText = aggregated.map(toIngredientTextGroups).map(({full}) => full);
+function AggregatedPlan({plan, preferredSystem} : {plan : FullPlan, preferredSystem : "imperial" | "metric"}) {
+    console.log(preferredSystem);
+    const aggregatedDays : IngredientEntry[] = aggregateDays(plan.days);
+    console.log(aggregatedDays);
+    const bestUnits : IngredientEntry[] = aggregatedDays.map((i) => toBestUnit(i, preferredSystem));
+    console.log(bestUnits);
+    const aggregatedText = bestUnits.map(toIngredientTextGroups).map(({full}) => full);
     return ( 
         <>
         <h1>{plan.name}</h1>
@@ -22,7 +22,6 @@ function AggregatedPlan({plan} : {plan : FullPlan}) {
             aggregatedText.map(
                 (text, i) => (
                     <div className="flex flex-row w-full my-1" key={i}>
-                        {/*<FontAwesomeIcon className="w-3 mr-2" icon={faSquare}/>*/}
                         <input type="checkbox" className=" mr-2 my-auto"/>
                         {text}
                     </div>

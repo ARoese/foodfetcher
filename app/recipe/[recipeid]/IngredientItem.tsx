@@ -4,9 +4,16 @@ import type { IngredientEntry } from "@prisma/client";
 import { useState } from "react";
 import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { parsedIngredientToIngredientEntry, toIngredientTextGroups, tryParseIngredient } from "../../../lib/ingredientTools";
+import { toBestUnit } from "@/lib/ingredientAggregations";
 
 
-type args = {ingredient: IngredientEntry, beingEdited : boolean, setIngredient : (ing : IngredientEntry) => void};
+type args = {
+    ingredient: IngredientEntry, 
+    beingEdited : boolean, 
+    preferredSystem : "imperial" | "metric", 
+    setIngredient : (ing : IngredientEntry) => void
+};
+
 /**
     Draws a textbox that will be continuously coerced into a proper ingredientEntry
     so long as it can be. Whenever the textbox is updated, the component attempts to
@@ -22,9 +29,12 @@ type args = {ingredient: IngredientEntry, beingEdited : boolean, setIngredient :
     @param beingEdited Whether this entry should allow edits or merely display
     @param setIngredient Function that should be called to change the ingredient
 */
-function IngredientItem({ingredient, beingEdited, setIngredient} : args) {
+function IngredientItem({ingredient, beingEdited, preferredSystem, setIngredient} : args) {
     // make it into text groups. Symbol may be empty
     const {amount, symbol, name, full: ingredientText} = toIngredientTextGroups(ingredient);
+    // convert it to preferred units for non-editing display text
+    const {full: bestIngredientText} = toIngredientTextGroups(toBestUnit(ingredient, preferredSystem));
+    console.log(bestIngredientText);
     // default text state to go to when state is invalid (not initialized or prop change)
     const defaultDynIngredientState = {
         valid: tryParseIngredient(ingredientText).valid,
@@ -107,7 +117,7 @@ function IngredientItem({ingredient, beingEdited, setIngredient} : args) {
                     </button>
                     
                     </>
-                ) : <p className={`mr-auto ${dynIngredient.valid ? "" : "text-red-800"}`}>{dynIngredient.text}</p>
+                ) : <p className={`mr-auto ${dynIngredient.valid ? "" : "text-red-800"}`}>{bestIngredientText}</p>
             }
         </li>
      );

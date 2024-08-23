@@ -6,8 +6,6 @@ import type { IngredientEntry } from "@prisma/client";
 type FullDay = FullPlan["days"][number];
 type FullQuantRecipe = FullDay["quantRecipes"][number];
 
-const allUnits = convert().possibilities();
-
 // https://stackoverflow.com/a/42299191
 const partition = <T,>(
     array: T[],
@@ -27,10 +25,14 @@ function fixUnit(unit : string|null) : string|null {
     if(unit == null){
         return null;
     }
-    if(unit == "tbsp" || unit == "tbsps")
+
+    unit = unit.toLowerCase();
+
+    if(unit == "tbs" || unit == "tbsp" || unit == "tbsps")
         return "Tbs";
-    
-    return unit.toLowerCase();
+    else if(unit == "floz")
+        return "fl-oz";
+    return unit;
 }
 
 function isconvertible(measure : string) : boolean{
@@ -45,23 +47,27 @@ function isconvertible(measure : string) : boolean{
     }
 }
 
-function convertIngredientTo(ingredient : IngredientEntry, unit : string) : IngredientEntry{
-    ingredient.amount = convert(ingredient.amount)
+//** Requires that the conversion is valid  */
+export function convertIngredientTo(ingredient : IngredientEntry, unit : string) : IngredientEntry{
+    const ingredientCopy = {...ingredient};
+    const fixedSymbol = fixUnit(ingredient.measureSymbol);
+    
+    ingredientCopy.amount = convert(ingredient.amount)
         // @ts-ignore
-        .from(ingredient.measureSymbol)
+        .from(fixedSymbol)
         // @ts-ignore
         .to(unit);
     if(ingredient.amount2 !== null){
-        ingredient.amount2 = convert(ingredient.amount2)
+        ingredientCopy.amount2 = convert(ingredient.amount2)
             // @ts-ignore
-            .from(ingredient.measureSymbol)
+            .from(fixedSymbol)
             // @ts-ignore
             .to(unit);
     }
 
-    ingredient.measureSymbol = unit;
+    ingredientCopy.measureSymbol = unit;
 
-    return ingredient;
+    return ingredientCopy;
 }
 
 function combineIngredients(ingredient1 : IngredientEntry, ingredient2 : IngredientEntry) : IngredientEntry{
@@ -128,7 +134,6 @@ function applyQuantity({quantity, recipe} : FullQuantRecipe) : IngredientEntry[]
             ingredient.amount*=quantity;
             
             if(ingredient.amount2 !== null){
-                
                 ingredient.amount2 *= quantity;
             }
             return ingredient;
@@ -144,28 +149,36 @@ export function aggregateDays(days : FullDay[]) : IngredientEntry[]{
     );
 }
 
+// TODO: make this user-configurable
 const undesirableUnits = [
     "in3",
     "msk",
     "tsk",
+    "kkp",
+    "glas",
+    "mm3",
     "cm3",
     "cl",
     "dl",
+    "kanna",
     "st"
 ]
 
-export function toBestUnit(ingredient : IngredientEntry){
-    if(!isconvertible(ingredient.measureSymbol)){
+export function toBestUnit(ingredient : IngredientEntry, system : "imperial" | "metric" = "imperial"){
+    console.log(ingredient);
+    const fixedSymbol = fixUnit(ingredient.measureSymbol);
+    if(!isconvertible(fixedSymbol)){
+        console.log(ingredient.measureSymbol)
         return ingredient;
     }
     
     const bestUnit = convert(ingredient.amount)
         // @ts-ignore
-        .from(ingredient.measureSymbol)
+        .from(fixedSymbol)
         .toBest({
             // @ts-ignore
             exclude: undesirableUnits,
-            system: "imperial"
+            system: system
         });
 
     if(bestUnit === null){

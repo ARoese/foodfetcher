@@ -12,12 +12,13 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  passhash  String?
-  recipes   Recipe[] @relation(name: "creator")
-  favorites Recipe[] @relation(name: "favoritedBy")
-  plans     Plan[]
+  id                     Int      @id @default(autoincrement())
+  name                   String   @unique
+  passhash               String?
+  recipes                Recipe[] @relation(name: "creator")
+  favorites              Recipe[] @relation(name: "favoritedBy")
+  plans                  Plan[]
+  preferredMeasureSystem String   @default("imperial")
 }
 
 model Recipe {

@@ -6,9 +6,10 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 type args = {
     ingredients : IngredientEntry[], // ingredients to display/edit
     setIngredients : (ingredients : IngredientEntry[]) => void, // updator function
-    beingEdited : boolean // whether the user is editing things
+    beingEdited : boolean, // whether the user is editing things
+    preferredSystem : "imperial" | "metric"
 }
-function IngredientsDisplay({ingredients, setIngredients, beingEdited} : args) {
+function IngredientsDisplay({ingredients, setIngredients, beingEdited, preferredSystem} : args) {
     function addNewIngredient(){
         setIngredients([
             ...ingredients,
@@ -31,6 +32,7 @@ function IngredientsDisplay({ingredients, setIngredients, beingEdited} : args) {
                         key={ingredient.sortIndex} 
                         beingEdited={beingEdited}
                         ingredient={{...ingredient, sortIndex: i}}
+                        preferredSystem={preferredSystem}
                         // each ingredientItem gets an updator function that will
                         // correctly and safely update the recipe state up here.
                         // all they have to do is call it with the new ingredientEntry

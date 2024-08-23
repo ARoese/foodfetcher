@@ -30,11 +30,12 @@ type args = {
     creatingNew : boolean,
     canEdit : boolean,
     isFavorited : boolean,
-    isLoggedIn : boolean
+    isLoggedIn : boolean,
+    preferredSystem : "imperial" | "metric"
 };
 
 /** Facilitates viewing and editing of a single recipe */
-function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorited, isLoggedIn} : args) {
+function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorited, isLoggedIn, preferredSystem} : args) {
     const [cancelRecipe, setCancelRecipe] = useState(recipe);
     const [dynRecipe, setDynRecipe] = useState(recipe);
     const [beingEdited, setBeingEdited] = useState(creatingNew);
@@ -229,7 +230,9 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorite
                         <IngredientsDisplay 
                             ingredients={dynRecipe.ingredients}
                             setIngredients={setIngredients}
-                            beingEdited={beingEdited}/>
+                            beingEdited={beingEdited}
+                            preferredSystem={preferredSystem}
+                        />
                     </ul>
                 </div>
                 <BulkIngredientEditor 
