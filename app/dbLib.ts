@@ -6,15 +6,59 @@ import { Plan, Prisma, PrismaClient, Recipe, User } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function getRecipes(page : number = 1, count : number = 12){
+export type RecipeQueryParams = {name? : string, author? : string, keywords? : string}
+export async function getRecipes(
+        page : number = 1,
+        count : number = 12,
+        queryParams? : RecipeQueryParams) : Promise<{numPages : number, recipes : Recipe[]}>{
+    // selectively generate elements of the AND query based on what was actually given
+    const conditions : Prisma.RecipeWhereInput[] = [];
+    if(queryParams?.author){
+        conditions.push({ creator: { name: { contains: queryParams.author } } });
+    }
+    if(queryParams?.keywords){
+        conditions.push(
+            {
+                AND: queryParams.keywords.split(',').map((e) => e.trim()).map(
+                    (keyword) : Prisma.RecipeWhereInput => ({ 
+                            OR: [
+                            // instructions contains keyword
+                            { instructions: { contains: keyword } },
+                            // any ingredient has keyword
+                            { ingredients: { some: { ingredientName: { contains: keyword } } } },
+                            // title has keyword
+                            { name: { contains: keyword } },
+                        ]
+                    })
+                )
+            }
+        );
+    }
+    if(queryParams?.name){
+        conditions.push({name: {contains: queryParams.name}});
+    }
+    // change from 1-based to 0-based index
     page-=1;
-    const numPages = Math.ceil(await prisma.recipe.count() / count); // TODO: do criteria
-    const recipes = await prisma.recipe.findMany(
-        {
-            skip: page*count,
-            take: count
-        }
-    );
+    // TODO: somehow make this into a single query
+    const [numPages, recipes] = await Promise.all([
+        // get how many recipes match the query
+        prisma.recipe.count({
+            where: {
+                AND: conditions
+            }
+        }).then((res) => Math.ceil(res / count)),
+        // get the page of recipes matching the query
+        prisma.recipe.findMany(
+            {
+                skip: page*count,
+                take: count,
+    
+                where: {
+                    AND: conditions
+                }
+            }
+        )
+    ]);
 
     return {numPages, recipes};
 }
