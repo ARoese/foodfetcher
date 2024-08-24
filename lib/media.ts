@@ -39,22 +39,29 @@ function readableStreamToReadStream(readableStream) {
     const reader = readableStream.getReader();
     
     return new Readable({
-      async read() {
-        try {
-          const { done, value } = await reader.read();
-          if (done) {
-            this.push(null); // End of stream
-          } else {
-            this.push(Buffer.from(value));
-          }
-        } catch (error) {
-          this.destroy(error); // Handle errors
+        async read() {
+            try {
+                const { done, value } = await reader.read();
+                if (done) {
+                    this.push(null); // End of stream
+                } else {
+                    this.push(Buffer.from(value));
+                }
+            } catch (error) {
+                this.destroy(error); // Handle errors
+            }
         }
-      }
     });
-  }
+}
+
+function ensurePaths(){
+    const options = {recursive: true};
+    fs.mkdirSync(videosPath, options);
+    fs.mkdirSync(imagesPath, options);
+}
 
 export async function setMedia(name : string, type : "video" | "image", form : FormData | null) : Promise<string>{
+    ensurePaths();
     if(form == null){
         const fp = fullPath(name, type);
         fs.unlinkSync(fp);
