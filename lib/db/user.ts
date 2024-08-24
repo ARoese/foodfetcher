@@ -1,8 +1,10 @@
 "use server";
 
-import { auth, createPassword, signIn, verifyPasswordAgainstDB } from "@/auth";
+import { auth, createPassword, verifyPasswordAgainstDB } from "@/auth";
 import { DAYS } from "@/prisma/consts";
 import { Plan, Prisma, PrismaClient, Recipe, User } from "@prisma/client";
+import { signIn } from "next-auth/react";
+import { redirect } from "next/navigation";
 
 const prisma = new PrismaClient();
 
@@ -69,7 +71,7 @@ export async function getCurrentUserOrLogin() : Promise<SafeUser> {
     const currentUser = await getCurrentUser();
     // if not logged in, send them to do so
     if(!currentUser){
-        signIn();
+        redirect("api/auth/signin");
     }else{
         return currentUser;
     }
