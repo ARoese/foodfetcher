@@ -182,7 +182,7 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
             />
             <button className="absolute left-0" onClick={onClickEdit}>{editing ? "Save" : "Edit"}</button>
             {
-                editing
+                editing && planIndex !== null
                 ? <button className="text-red-700 absolute right-0" onClick={async () => await deletePlan(planIndex.value)}>Delete</button>
                 : (
                     planIndex &&
