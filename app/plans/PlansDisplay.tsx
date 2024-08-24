@@ -60,11 +60,13 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
             );
         }
 
-        toast.promise(tryDelete(), {
-            pending: "Deleting plan...",
-            success: "Deleted plan",
-            error: "Failed to delete plan"
-        });
+        try{
+            toast.promise(tryDelete(), {
+                pending: "Deleting plan...",
+                success: "Deleted plan",
+                error: "Failed to delete plan"
+            });
+        }catch{}
     }
 
     function makeUpdatePlan(i : number) : (plan : DeepPlan) => void{
@@ -125,18 +127,21 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
 
         const updatingPromise = Promise.all(toUpdate.map(updatePlan));
         var wasError : Boolean  = false;
-        await toast.promise(updatingPromise, {
-            pending: `Updating ${toUpdate.length} plans...`,
-            error: {
-                render: (e) => {
-                    const error = e.data as Error;
-                    console.log(e);
-                    wasError = true;
-                    return `Failed to save plans: ${error.message}`;
-                }
-            },
-            success: `Updated ${toUpdate.length} plan${toUpdate.length > 1 ? "s" : ""}.`
-        });
+        try{
+            await toast.promise(updatingPromise, {
+                pending: `Updating ${toUpdate.length} plans...`,
+                error: {
+                    render: (e) => {
+                        const error = e.data as Error;
+                        console.log(e);
+                        wasError = true;
+                        return `Failed to save plans: ${error.message}`;
+                    }
+                },
+                success: `Updated ${toUpdate.length} plan${toUpdate.length > 1 ? "s" : ""}.`
+            });
+        }catch{}
+        
 
         if(wasError){
             return;

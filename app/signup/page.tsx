@@ -5,6 +5,8 @@ import SmallPageContainer from "../components/SmallPageContainer";
 // @ts-ignore This module does actually exist, and behaves as such. Intellisense is wrong.
 import { createUser } from "@/lib/db/user";
 import { signIn } from "next-auth/react";
+// @ts-ignore This module does actually exist, and behaves as such. Intellisense is wrong.
+import { ActionResult, isLeft } from "@/lib/actions";
 
 function Signup() {
     async function submitAction(data : FormData) {
@@ -24,15 +26,18 @@ function Signup() {
         }
 
         const createUserPromise = createUser(username, password);
-        await toast.promise(createUserPromise, {
-            pending: "Creating user",
-            success: "User created",
-            error: {
-                render({data} : {data: Error}){
-                    return data.message;
-                }
-            },
-        }).then(() => signIn(null, {redirect: true, callbackUrl: "/account"}));
+        try{
+            await toast.promise(createUserPromise, {
+                pending: "Creating user",
+                success: "User created",
+                error: {
+                    render({data} : {data: Error}){
+                        console.log(data);
+                        return data.message;
+                    }
+                },
+            }).then(() => signIn(null, {redirect: true, callbackUrl: "/account"}));
+        }catch{}
     }
     return ( 
         <SmallPageContainer>

@@ -22,7 +22,7 @@ export async function usernameTaken(username : string){
     return count != 0;
 }
 
-export async function createUser(username : string, password : string) {
+export async function createUser(username : string, password : string) : Promise<void> {
     if(username.trim() != username){
         throw new Error("Username cannot be empty or include whitespace at its start or end");
     }
@@ -43,7 +43,7 @@ export async function createUser(username : string, password : string) {
 export async function updateUser(userId : number, userName : string, preferredSystem : string, currentPassword : string, newPassword : string|undefined) : Promise<void>{
     // only user who know their own passwords can get through this function anyways; no
     // need to ensure they are actually logged in or anything
-    if(!verifyPasswordAgainstDB(currentPassword, userId)){
+    if(!await verifyPasswordAgainstDB(currentPassword, userId)){
         throw new Error("Incorrect current password");
     }
 

@@ -32,23 +32,26 @@ function AccountView({account} : {account : SafeUser}) {
         }
 
         const updatePromise = updateUser(account.id, newUser, preferredSystem, currentPass, newPass);
-        await toast.promise(updatePromise, {
-            pending: "Updating your account information...",
-            error: {
-                render({data} : {data: Error}){
-                    //console.log(data);
-                    return data.message;
-                }
-            },
-            success: "Successfully updated profile"
-        }).then(() => toast.info(
-            "If you updated your username, then the change will only take effect on the nav bar when you next log in.",
-            {
-                autoClose: 10000
-            }
-        ));
-
-        setEditing(false);
+        try{
+            await toast.promise(updatePromise, {
+                pending: "Updating your account information...",
+                error: {
+                    render({data} : {data: Error}){
+                        //console.log(data);
+                        return data.message;
+                    }
+                },
+                success: "Successfully updated profile"
+            }).then(() => {
+                toast.info(
+                    "If you updated your username, then the change will only take effect on the nav bar when you next log in.",
+                    {
+                        autoClose: 10000
+                    }
+                );
+                setEditing(false);
+            });
+        }catch{}
     }
 
     

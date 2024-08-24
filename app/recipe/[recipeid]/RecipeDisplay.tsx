@@ -66,15 +66,17 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorite
             const promise = updateRecipe(dynRecipe)
                             .then((recipe) => creatingNew ? router.push(`./${recipe.id}`) : null);
             
-            await toast.promise(promise, {
-                    pending: "Saving recipe",
-                    success: "Saved recipe",
-                    error: "Failed to save recipe",
-                }, 
-                {
-                    autoClose: 10000
-                },
-            );
+            try{
+                await toast.promise(promise, {
+                        pending: "Saving recipe",
+                        success: "Saved recipe",
+                        error: "Failed to save recipe",
+                    }, 
+                    {
+                        autoClose: 10000
+                    },
+                );
+            }catch{}
         }
 
         if(!dynRecipe.ingredients.every((ingredient) => ingredient.amount != 0)){
