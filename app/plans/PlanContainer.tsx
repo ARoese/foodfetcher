@@ -39,13 +39,11 @@ function Plan({plan, setPlan, editing} : args) {
             {
                 plan.days.map(
                     (day, i) => (
-                    <>
                     <DayContainer 
                         key={day.dayName}
                         day={day}
                         setDay={makeSetDay(i)}
                         editing={editing}/>
-                    </>
                     )
                 )
             }

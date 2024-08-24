@@ -163,6 +163,7 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
         <div className="mx-auto flex flex-row relative m-2">
             <CreatableSelect
                 onChange={setPlanIndex}
+                instanceId="plan-creation-dropdown"
                 value={planIndex}
                 className="w-fit min-w-64 mx-auto" 
                 options={dynPlansOptions}
