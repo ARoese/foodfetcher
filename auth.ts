@@ -11,6 +11,7 @@ export function doPasswordHash(password : string, salt : string) : string{
     return scryptSync(password, salt, 64).toString(BUFFER_ENCODING);
 }
 
+/** hash and salt a password, returning a string that should go into the database */
 export function createPassword(password : string) : string {
     const salt = randomBytes(32).toString(BUFFER_ENCODING);
     const hash = doPasswordHash(password, salt);

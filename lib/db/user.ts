@@ -9,6 +9,37 @@ const prisma = new PrismaClient();
 type Without<T, K> = Pick<T, Exclude<keyof T, K>>;
 export type SafeUser = Without<User, "passhash">;
 
+// TODO: all server actions should return an object with the error reason instead of actually throwing an error
+
+/** returns true if the username is taken */
+export async function usernameTaken(username : string){
+    const count = await prisma.user.count({
+        where: {
+            name: username
+        }
+    });
+
+    return count != 0;
+}
+
+export async function createUser(username : string, password : string) {
+    if(username.trim() != username){
+        throw new Error("Username cannot be empty or include whitespace at its start or end");
+    }
+
+    if(await usernameTaken(username)){
+        throw new Error("This username is already taken");
+    }
+
+    // TODO: do strict password checks here
+    await prisma.user.create({
+        data: {
+            name: username,
+            passhash: await createPassword(password)
+        }
+    });
+}
+
 export async function updateUser(userId : number, userName : string, preferredSystem : string, currentPassword : string, newPassword : string|undefined) : Promise<void>{
     // only user who know their own passwords can get through this function anyways; no
     // need to ensure they are actually logged in or anything
