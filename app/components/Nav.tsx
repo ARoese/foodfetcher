@@ -19,8 +19,13 @@ export default async function Nav(){
                 </Link>
                 <NavLink href="/">Home</NavLink>
                 <NavLink href="/browse">Browse Recipes</NavLink>
-                <NavLink href="/recipe/create">Create Recipe</NavLink>
-                <NavLink href="/plans">Meal Plans</NavLink>
+                {
+                    isLoggedIn &&
+                    <>
+                    <NavLink href="/recipe/create">Create Recipe</NavLink>
+                    <NavLink href="/plans">Meal Plans</NavLink>
+                    </>
+                }
                 {
                     isLoggedIn ? (
                     <>
@@ -31,8 +36,8 @@ export default async function Nav(){
                     </>
                     ) : (
                     <>  
-                        <LogInButton/>
-                        <Link id='/signup' href="signup">Sign Up</Link>
+                        <NavLink href="api/auth/signin">Login</NavLink>
+                        <NavLink href="signup">Sign Up</NavLink>
                     </>
                     )
                 }
