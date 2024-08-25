@@ -1,10 +1,9 @@
 import Link from "next/link";
 import logoDark from "@/public/images/logo-dark.png"
 import Image from "next/image";
-import LogOutButton from "./LogOutButton";
 import { auth } from "@/auth";
-import LogInButton from "./LogInButton";
 import NavLink from "./NavLink";
+
 
 export default async function Nav(){
     const session = await auth();
@@ -20,25 +19,20 @@ export default async function Nav(){
                 <NavLink href="/">Home</NavLink>
                 <NavLink href="/browse">Browse Recipes</NavLink>
                 {
-                    isLoggedIn &&
-                    <>
-                    <NavLink href="/recipe/create">Create Recipe</NavLink>
-                    <NavLink href="/plans">Meal Plans</NavLink>
-                    </>
-                }
-                {
                     isLoggedIn ? (
-                    <>
-                        <div id='logout'>
-                            Hello, <Link href="/account">{session.user.name}</Link><br/>
-                            <LogOutButton/><br/>
+                        <>
+                        <NavLink href="/recipe/create">Create Recipe</NavLink>
+                        <NavLink href="/plans">Meal Plans</NavLink>
+                        <div className="flex flex-col">
+                            <NavLink className="h-3/6" href="/account">Hello, {session.user.name}</NavLink>
+                            <NavLink className="h-3/6" signOut={true} href="">Sign out</NavLink>
                         </div>
-                    </>
+                        </>
                     ) : (
-                    <>  
-                        <NavLink href="api/auth/signin">Login</NavLink>
+                        <>  
+                        <NavLink login={true} href="">Login</NavLink>
                         <NavLink href="signup">Sign Up</NavLink>
-                    </>
+                        </>
                     )
                 }
             </nav>
