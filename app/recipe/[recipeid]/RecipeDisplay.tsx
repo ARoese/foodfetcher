@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 import { IngredientEntry, PrismaClient, type Prisma } from "@prisma/client";
 import { useRouter } from 'next/navigation'
@@ -18,12 +17,9 @@ type RecipeWithRelations = Prisma.RecipeGetPayload<{
 import ReactTextareaAutosize from "react-textarea-autosize";
 import IngredientsDisplay from "./IngredientsDisplay";
 import BulkIngredientEditor from "./BulkIngredientEditor";
-import { FileUploader } from "react-drag-drop-files";
-import { setMedia } from "@/lib/media";
-import recipeImageJsx from "@/app/recipeUtil";
-import UploadCover from "./UploadCover";
 import { setFavorite } from "@/lib/db/favorites";
 import { updateRecipe, deleteRecipe } from "@/lib/db/recipes";
+import FileUploads from "./FileUploads";
 
 type args = {
     recipe: RecipeWithRelations,
@@ -110,30 +106,6 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorite
         setFavorited(!favorited);
     }
 
-    async function handleImageUpload(file : File){
-        console.log(file);
-        const d = new FormData();
-        d.append("image", file);
-        const remoteName = await setMedia(file.name, "image", d);
-        setDynRecipe({
-            ...dynRecipe,
-            imageFile: remoteName
-        });
-    }
-
-    async function handleVideoUpload(file : File){
-        console.log(file);
-        const d = new FormData();
-        d.append("video", file);
-        const remoteName = await setMedia(file.name, "video", d);
-        setDynRecipe({
-            ...dynRecipe,
-            videoFile: remoteName
-        });
-    }
-
-    //console.log(dynRecipe.imageFile);
-    // TODO: break this out into some sub-components
     return ( 
         <>
         {
@@ -148,9 +120,7 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorite
                         <button onClick={() => {setDynRecipe(cancelRecipe); setBeingEdited(false)}}>Cancel</button>
                         <button className="text-red-800 ml-auto" onClick={async () => await handleDeleteRecipe()}>Delete</button>
                         </>
-                        
                     }
-                    
                 </div>
                 <div className="mx-auto text-center">
                     <input className="text-center"
@@ -179,57 +149,15 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorite
         <h2>{dynRecipe.creator.name}</h2>
         <h2>{dynRecipe.updatedAt ? dynRecipe.updatedAt.toISOString() : ""}</h2>
         <div className="flex flex-row">
-            <div className="w-2/5 h-fit">
-            {
-                beingEdited
-                ? (
-                    <>
-                    <FileUploader 
-                        label="Drop an image here"
-                        handleChange={handleImageUpload}
-                    >
-                        <div className="relative">
-                            {recipeImageJsx(dynRecipe)}
-                            <UploadCover 
-                                text={"Upload recipe image"}
-                                className="absolute inset-0 bg-white bg-opacity-60"
-                            />
-                        </div>
-                    </FileUploader>
-                    <FileUploader
-                        label="Drop a video here"
-                        handleChange={handleVideoUpload}
-                    >
-                        <div className="relative">
-                            { // Same thing but without controls. This allows a click without play
-                                dynRecipe.videoFile 
-                                ? <video width="100%" className="max-w-fit" src={`/media/video/${dynRecipe.videoFile}`}>
-                                    Your browser does not support the video tag
-                                </video>
-                                : <div className="min-w-fit min-h-60 bg-gray-400">
-                                    <p className="my-auto">Drop a video file here</p>
-                                </div>
-                            }
-                            <UploadCover 
-                                text={"Upload recipe video"}
-                                className="absolute inset-0 bg-white bg-opacity-60"
-                            />
-                        </div>
-                    </FileUploader>
-                    </>
-                ) : (
-                    <>
-                    {recipeImageJsx(dynRecipe)}
-                    {
-                        dynRecipe.videoFile &&
-                        <video controls width="100%" className="max-w-fit" src={`/media/video/${dynRecipe.videoFile}`}>
-                            Your browser does not support the video tag
-                        </video>
-                    }
-                    </>
-                    
-                )
-            }
+            <div className="max-w-2/5 h-fit">
+                <FileUploads 
+                    beingEdited={beingEdited}
+                    imageFile={dynRecipe.imageFile}
+                    videoFile={dynRecipe.videoFile}
+                    /* !!not the same function! note structuring assignment with names */
+                    setImageFile={(imageFile : string) => setDynRecipe({...dynRecipe, imageFile})}
+                    setVideoFile={(videoFile : string) => setDynRecipe({...dynRecipe, videoFile})}
+                />
             </div>
             
             <div className="flex flex-col w-full">
