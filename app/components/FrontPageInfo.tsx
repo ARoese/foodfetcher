@@ -56,13 +56,14 @@ export default function FrontPageInfo(){
                     </table>
                 </div>
             </div>
-            <Image 
-                id="plate1"
-                // @ts-ignore
-                height="100%"
-                alt="Image of a plate"
-                src={plate1}
-            />
+            <div className="aspect-square">
+                <Image 
+                    id="plate1"
+                    alt="Image of a plate"
+                    src={plate1}
+                />
+            </div>
+            
             <div id="info-title">
                 <div>
                     <p style={{fontSize: "5vh", borderBottom: "3px solid var(--green)"}}>
