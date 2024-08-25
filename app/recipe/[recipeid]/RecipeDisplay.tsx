@@ -142,8 +142,15 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorite
                 <>
                 <div className="flex flex-row">
                     <button onClick={async () => await handleSaveRecipe()}>Save</button>
-                    <button onClick={() => {setDynRecipe(cancelRecipe); setBeingEdited(false)}}>Cancel</button>
-                    <button className="text-red-800 ml-auto" onClick={async () => await handleDeleteRecipe()}>Delete</button>
+                    {
+                        !creatingNew &&
+                        <>
+                        <button onClick={() => {setDynRecipe(cancelRecipe); setBeingEdited(false)}}>Cancel</button>
+                        <button className="text-red-800 ml-auto" onClick={async () => await handleDeleteRecipe()}>Delete</button>
+                        </>
+                        
+                    }
+                    
                 </div>
                 <div className="mx-auto text-center">
                     <input className="text-center"

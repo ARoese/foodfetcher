@@ -68,6 +68,7 @@ function BulkIngredientEditor({display, ingredients, setIngredients} : args) {
                                 style={{width: "100%"}}
                                 wrap="soft"
                                 value={bulkEditText}
+                                placeholder="Type any number of ingredients to be parsed"
                                 onChange={(e) => setBulkEditText(e.target.value)}
                             />
                         </label>
