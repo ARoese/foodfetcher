@@ -66,15 +66,16 @@ function AccountView({account} : {account : SafeUser}) {
         {
             editing
             ? (
-                <form action={doSave} className="flex flex-row w-1/3">
-                    <div className="flex flex-col mx-auto w-1/2">
-                        <label className="mb-4">
-                            username:<br/>
-                            <input name="newUser" value={userName} onChange={(e) => setUserName(e.target.value)}/>
-                        </label><br/>
+                <form action={doSave} className="flex flex-col w-3/5">
+                    
                         <label>
-                            preferred measure system:<br/>
+                            username:
+                            <input className="ml-2" name="newUser" value={userName} onChange={(e) => setUserName(e.target.value)}/>
+                        </label>
+                        <label>
+                            preferred measure system:
                             <select 
+                                className="ml-2"
                                 value={preferredSystem} 
                                 onChange={(e) => setPreferredSystem(e.target.value)}
                             >
@@ -83,32 +84,31 @@ function AccountView({account} : {account : SafeUser}) {
                             </select>
                         </label>
                         <label>
-                            current password:<br/>
-                            <input name="currentPass" required={true} type="password"/>
-                        </label><br/>
+                            current password:
+                            <input className="ml-2" name="currentPass" required={true} type="password"/>
+                        </label>
+                        <label>
+                            change password?
+                            <input className="ml-2" type="checkbox" defaultValue="false" onChange={() => setChangingPassword(!changingPassword)}/>
+                        </label>
                         {
                             changingPassword
                             ? (
-                                <><label>
-                                    new password:<br/>
-                                    <input name="newPass" required={true} type="password"/>
-                                </label><br/>
+                                <>
+                                <label>
+                                    new password:
+                                    <input className="ml-2" name="newPass" required={true} type="password"/>
+                                </label>
                                 </>
                             ) : ""
                         }
-                        <button type="submit">Save</button>
-                    </div>
-                    <div>
-                        <label className="mb-4">
-                            change password?<br/>
-                            <input type="checkbox" defaultValue="false" onChange={() => setChangingPassword(!changingPassword)}/>
-                        </label><br/>
-                    </div>
+                        <button type="submit" className="mt-4">Save</button>
+                    
                     
                 </form>
             ) : (
                 <>
-                <p>username:</p><p>{userName}</p>
+                <p>username: {userName}</p>
                 <p>preferred measure system: {preferredSystem}</p>
                 </>
             )

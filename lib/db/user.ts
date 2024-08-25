@@ -43,6 +43,10 @@ export async function createUser(username : string, password : string) : Promise
 }
 
 export async function updateUser(userId : number, userName : string, preferredSystem : string, currentPassword : string, newPassword : string|undefined) : Promise<void>{
+    if(await usernameTaken(userName)){
+        throw new Error("This username is already taken");
+    }
+    
     // only user who know their own passwords can get through this function anyways; no
     // need to ensure they are actually logged in or anything
     if(!await verifyPasswordAgainstDB(currentPassword, userId)){
