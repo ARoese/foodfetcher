@@ -1,13 +1,11 @@
 import SmallPageContainer from "@/app/components/SmallPageContainer";
-import { IngredientEntry, Prisma, PrismaClient, Recipe, User } from "@prisma/client";
-import { notFound, useRouter } from "next/navigation";
+import { IngredientEntry, Prisma, PrismaClient, Recipe } from "@prisma/client";
+import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import RecipeDisplay from "./RecipeDisplay";
-import { revalidatePath } from "next/cache";
-import { auth } from "@/auth";
-import { signIn } from "next-auth/react";
 import { hasFavorited } from "@/lib/db/favorites";
 import { getCurrentUser, getCurrentUserOrLogin } from "@/lib/db/user";
+import wrappedAction from "@/lib/wrappedAction-server";
 
 const prisma = new PrismaClient();
 
@@ -104,7 +102,7 @@ async function RecipeDisplayPage({params: {recipeid}}) {
     }
 
     const canEdit = creating || currentUser !== null && recipe.creatorId == currentUser.id;
-    const isFavorited = recipe.id ? await hasFavorited(recipe.id) : false;
+    const isFavorited = recipe.id ? await wrappedAction(hasFavorited(recipe.id)) : false;
     const preferredSystem = currentUser?.preferredMeasureSystem ?? "imperial";
     return ( 
         <SmallPageContainer>

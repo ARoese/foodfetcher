@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth";
 import { Prisma, PrismaClient, Recipe } from "@prisma/client";
+import { intoError, intoResult, ServerActionResponse } from "../actions";
 
 const prisma = new PrismaClient();
 
@@ -62,10 +63,10 @@ export async function getRecipes(
     return {numPages, recipes};
 }
 
-export async function getOwnRecipes() : Promise<Recipe[]> {
+export async function getOwnRecipes() : Promise<ServerActionResponse<Recipe[]>> {
     const session = await auth();
     if(session == null){
-        throw new Error("You are not logged in");
+        return intoError("You are not logged in");
     }
 
     const userReq = await prisma.user.findUnique({
@@ -77,10 +78,10 @@ export async function getOwnRecipes() : Promise<Recipe[]> {
         }
     });
 
-    return userReq.recipes;
+    return intoResult(userReq.recipes);
 }
 
-async function checkCanModifyRecipe(recipeId : number) {
+async function checkCanModifyRecipe(recipeId : number) : Promise<string | null>{
     // get session and recipe we're modifying
     const [session, recipe] = await Promise.all(
         [
@@ -95,17 +96,22 @@ async function checkCanModifyRecipe(recipeId : number) {
 
     // check it's ok to delete it
     if(!session){
-        throw new Error("Not logged in");
+        return "Not logged in";
     }else if(recipe === null){
-        throw new Error("Recipe does not exist");
+        return "Recipe does not exist";
     }else if(+session.user.id != recipe.creatorId){
-        throw new Error("You do not own this recipe");
+        return "You do not own this recipe";
     }
+
+    return null;
 }
 
-export async function deleteRecipe(recipeId : number){
+export async function deleteRecipe(recipeId : number) : Promise<ServerActionResponse<void>>{
     // verify caller has permission to delete this recipe
-    checkCanModifyRecipe(recipeId);
+    const errorReason = await checkCanModifyRecipe(recipeId);
+    if(errorReason !== null){
+        return intoError(errorReason);
+    }
     // actually delete it
     await prisma.recipe.delete({
         where: {
@@ -115,10 +121,18 @@ export async function deleteRecipe(recipeId : number){
 }
 
 // TODO: clean up these parameters
-export async function updateRecipe({ id, creatorId, name, instructions, videoFile, imageFile, ingredients} ) : Promise<Recipe>{
+export async function updateRecipe({ id, creatorId, name, instructions, videoFile, imageFile, ingredients} ) : Promise<ServerActionResponse<Recipe>>{
     // verify caller has permission to delete this recipe
-    checkCanModifyRecipe(id);
-    return await prisma.recipe.upsert({
+    const errorReason = await checkCanModifyRecipe(id);
+    if(errorReason !== null){
+        return intoError(errorReason);
+    }
+
+    if(name.trim() != name || name.trim() == ""){
+        return intoError("Recipe name cannot be empty or contain whitespace at the start or end");
+    }
+
+    const result = await prisma.recipe.upsert({
         where: { id: id || -1 },  // Assuming id will be null for new recipes
         update: {
             name,
@@ -166,4 +180,6 @@ export async function updateRecipe({ id, creatorId, name, instructions, videoFil
         }
         }
     });
+
+    return intoResult(result);
 }

@@ -10,6 +10,7 @@ import { DndContext, DragOverlay } from "@dnd-kit/core";
 import RecipeSmallItem from "../browse/RecipeSmallItem";
 import Link from "next/link";
 import { DeepPlan, newMealPlan, deleteMealPlan, updatePlan } from "@/lib/db/plans";
+import wrappedAction from "@/lib/wrappedAction";
 const deepEqual = require("deep-equal");
 
 type args = {plans : DeepPlan[], userId : number, favorites : Recipe[], ownRecipes : Recipe[]};
@@ -41,7 +42,7 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
         setDynPlans(
             [
                 ...dynPlans, 
-                await newMealPlan(userId, name)
+                await wrappedAction(newMealPlan(userId, name))
             ]
         );
     }
@@ -125,8 +126,7 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
             return;
         }
 
-        const updatingPromise = Promise.all(toUpdate.map(updatePlan));
-        var wasError : Boolean  = false;
+        const updatingPromise = Promise.all(toUpdate.map(updatePlan).map(wrappedAction));
         try{
             await toast.promise(updatingPromise, {
                 pending: `Updating ${toUpdate.length} plans...`,
@@ -134,20 +134,12 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
                     render: (e) => {
                         const error = e.data as Error;
                         console.log(e);
-                        wasError = true;
                         return `Failed to save plans: ${error.message}`;
                     }
                 },
                 success: `Updated ${toUpdate.length} plan${toUpdate.length > 1 ? "s" : ""}.`
-            });
+            }).then(() => setEditing(false));
         }catch{}
-        
-
-        if(wasError){
-            return;
-        }
-
-        setEditing(false);
     }
 
     //console.log(draggingRecipe);

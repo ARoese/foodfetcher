@@ -4,6 +4,7 @@ import { User } from "@prisma/client";
 import { useState } from "react";
 import { SafeUser, updateUser } from "../../lib/db/user";
 import { toast } from "react-toastify";
+import wrappedAction from "@/lib/wrappedAction";
 
 
 
@@ -12,7 +13,7 @@ function AccountView({account} : {account : SafeUser}) {
     const [changingPassword, setChangingPassword] = useState(false);
     const [userName, setUserName] = useState(account.name);
     const [preferredSystem, setPreferredSystem] = useState(account.preferredMeasureSystem);
-    console.log(preferredSystem);
+    //console.log(preferredSystem);
 
     async function doSave(e){
         if(!confirm("Are you sure you want to update your profile?")){
@@ -31,7 +32,7 @@ function AccountView({account} : {account : SafeUser}) {
             return;
         }
 
-        const updatePromise = updateUser(account.id, newUser, preferredSystem, currentPass, newPass);
+        const updatePromise = wrappedAction(updateUser(account.id, newUser, preferredSystem, currentPass, newPass));
         try{
             await toast.promise(updatePromise, {
                 pending: "Updating your account information...",

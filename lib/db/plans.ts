@@ -3,6 +3,7 @@
 import { auth } from "@/auth";
 import { DAYS } from "@/prisma/consts";
 import { PrismaClient, Prisma } from "@prisma/client";
+import { intoError, intoResult, ServerActionResponse } from "../actions";
 
 const prisma = new PrismaClient();
 
@@ -74,9 +75,9 @@ const fullPlanInclude = {
     }
 }
 
-export async function updatePlan(plan : DeepPlan) : Promise<void> {
-    if(!plan.name.trim()){
-        throw new Error("Plans cannot have empty names.");
+export async function updatePlan(plan : DeepPlan) : Promise<ServerActionResponse<void>> {
+    if(plan.name.trim() == ""){
+        return intoError("Plans cannot have empty names.");
     }
     await prisma.plan.update({
         where: {
@@ -114,10 +115,10 @@ function sortPlanDays(plan : DeepPlan){
     plan.days.sort((a, b) => DAYS.indexOf(a.dayName) - DAYS.indexOf(b.dayName));
 }
 
-export async function getMealPlan(planid : number) : Promise<FullPlan|null>{
+export async function getMealPlan(planid : number) : Promise<ServerActionResponse<FullPlan|null>>{
     const session = await auth();
     if(session == null){
-        throw new Error("You are not logged in");
+        return intoError("You are not logged in");
     }
 
     const plan = await prisma.plan.findUnique({
@@ -130,13 +131,13 @@ export async function getMealPlan(planid : number) : Promise<FullPlan|null>{
 
     sortPlanDays(plan);
 
-    return plan;
+    return intoResult(plan);
 }
 
-export async function getMealPlans() : Promise<DeepPlan[]> {
+export async function getMealPlans() : Promise<ServerActionResponse<DeepPlan[]>> {
     const session = await auth();
     if(session == null){
-        throw new Error("You are not logged in");
+        return intoError("You are not logged in");
     }
 
     const user = await prisma.user.findUnique({
@@ -156,10 +157,10 @@ export async function getMealPlans() : Promise<DeepPlan[]> {
     user.plans.forEach(sortPlanDays);
     
     console.log(user);
-    return user.plans;
+    return intoResult(user.plans);
 }
 
-export async function newMealPlan(userId : number, name : string) : Promise<DeepPlan> {
+export async function newMealPlan(userId : number, name : string) : Promise<ServerActionResponse<DeepPlan>> {
     // TODO: protect this
     const newPlan = await prisma.plan.create({
         data: {
@@ -180,7 +181,7 @@ export async function newMealPlan(userId : number, name : string) : Promise<Deep
     });
 
     sortPlanDays(newPlan);
-    return newPlan;
+    return intoResult(newPlan);
 }
 
 export async function deleteMealPlan(planId : number){

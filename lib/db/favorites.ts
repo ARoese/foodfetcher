@@ -2,13 +2,14 @@
 
 import { auth } from "@/auth";
 import { PrismaClient, Recipe } from "@prisma/client";
+import { intoError, intoResult, ServerActionResponse } from "../actions";
 
 const prisma = new PrismaClient();
 
-export async function getFavorites() : Promise<Recipe[]> {
+export async function getFavorites() : Promise<ServerActionResponse<Recipe[]>> {
     const session = await auth();
     if(session == null){
-        throw new Error("You are not logged in");
+        return intoError("You are not logged in");
     }
 
     const userReq = await prisma.user.findUnique({
@@ -20,13 +21,13 @@ export async function getFavorites() : Promise<Recipe[]> {
         }
     });
 
-    return userReq.favorites;
+    return intoResult(userReq.favorites);
 }
 
-export async function hasFavorited(recipeId : number) : Promise<boolean> {
+export async function hasFavorited(recipeId : number) : Promise<ServerActionResponse<boolean>> {
     const session = await auth();
     if(session == null){
-        return false;
+        return intoResult(false);
     }
 
     const favoritesCount = await prisma.user.findUnique({
@@ -47,13 +48,13 @@ export async function hasFavorited(recipeId : number) : Promise<boolean> {
     });
     console.log(favoritesCount);
 
-    return favoritesCount._count.favorites > 0;
+    return intoResult(favoritesCount._count.favorites > 0);
 }
 
-export async function setFavorite(recipeId : number, isFavorited : boolean) {
+export async function setFavorite(recipeId : number, isFavorited : boolean) : Promise<ServerActionResponse<void>>{
     const session = await auth();
     if(session == null){
-        throw new Error("You are not logged in");
+        return intoError("You are not logged in");
     } 
 
     /*

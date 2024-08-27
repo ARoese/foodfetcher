@@ -20,6 +20,7 @@ import BulkIngredientEditor from "./BulkIngredientEditor";
 import { setFavorite } from "@/lib/db/favorites";
 import { updateRecipe, deleteRecipe } from "@/lib/db/recipes";
 import FileUploads from "./FileUploads";
+import wrappedAction from "@/lib/wrappedAction";
 
 type args = {
     recipe: RecipeWithRelations,
@@ -59,19 +60,28 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorite
             // so that we don't stay on the create page after the recipe exists.
             // This would prevent people from trying to share their newly created recipe and
             // instead sharing the create page
-            const promise = updateRecipe(dynRecipe)
+            const promise = wrappedAction(updateRecipe(dynRecipe))
                             .then((recipe) => creatingNew ? router.push(`./${recipe.id}`) : null);
             
             try{
                 await toast.promise(promise, {
                         pending: "Saving recipe",
                         success: "Saved recipe",
-                        error: "Failed to save recipe",
+                        error: {
+                            render: (e) => {
+                                const error = e.data as Error;
+                                console.log(e);
+                                return `Failed to save recipe: ${error.message}`;
+                            }
+                        },
                     }, 
                     {
                         autoClose: 10000
                     },
-                );
+                ).then(() => {
+                    setBeingEdited(false);
+                    setCancelRecipe(dynRecipe);
+                });
             }catch{}
         }
 
@@ -80,13 +90,12 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorite
             return;
         }
 
-        setBeingEdited(false); // do this before saving so the user can't interfere
+        
         setSaving(true); // let everything know we're saving so they lock down
         // TODO: go back to editing if the save fails for any reason
         // this should keep the current values that failed to save
         // so they can be tried again or modified
         await doSave(); 
-        setCancelRecipe(dynRecipe);
         // ensure bulk edit stays consistent
         setSaving(false);
     }
