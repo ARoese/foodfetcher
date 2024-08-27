@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { DAYS } from "./consts";
+import { parseArgs } from "util";
 const prisma = new PrismaClient();
 
 const sampleIngredients = [
@@ -54,7 +55,7 @@ function getRandomIngredients(n : number) : PartialIngredient[]{
         );
 }
 
-async function main(){
+async function addFakeData(){
     const user1 = await prisma.user.create({
         data: 
             {
@@ -67,9 +68,6 @@ async function main(){
                 name: "devUser2"
             }
     });
-
-    addWeekdays();
-    addIngredients();
 
     for (const num in [...Array(10).keys()]){
         await prisma.recipe.create({
@@ -92,6 +90,30 @@ async function main(){
                 }
             }
         });
+    }
+}
+
+async function main(){
+    const {values: {fake}} = parseArgs({
+        args: process.argv,
+        options: {
+            fake: {
+                type: "boolean",
+                short: "f",
+                default: false
+            },
+        },
+        allowPositionals: true
+    });
+
+    addWeekdays(); // this is just creating an "enum" enforced by database constraints
+
+    if(fake){
+        console.log("Creating fake data");
+        addIngredients();
+        addFakeData();
+    }else{
+        console.log("Not creating fake data. Pass -f or --fake to generate fake recipes and dev users");
     }
 }
 
