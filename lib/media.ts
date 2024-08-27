@@ -4,8 +4,8 @@ import fs, { ReadStream } from "fs";
 import path from "path";
 import { Readable } from "stream";
 
-const videosPath = "media/videos/";
-const imagesPath = "media/images/";
+const videosPath = "data/media/videos/";
+const imagesPath = "data/media/images/";
 
 function hashName(name : string) : string {
     const nowMs = Date.now();
