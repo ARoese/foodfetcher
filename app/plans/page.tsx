@@ -18,7 +18,7 @@ export async function generateMetadata() {
 async function MealPlanPage() {
     const session = await auth();
     if(!session){
-        redirect("api/auth/signin");
+        redirect("/api/auth/signin");
     }
 
     // this is a deep get all the way down to every recipe included

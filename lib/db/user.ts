@@ -99,7 +99,7 @@ export async function getCurrentUserOrLogin() : Promise<SafeUser> {
 
     // if not logged in, send them to do so
     if(!currentUser){
-        redirect("api/auth/signin");
+        redirect("/api/auth/signin");
     }else{
         return currentUser;
     }

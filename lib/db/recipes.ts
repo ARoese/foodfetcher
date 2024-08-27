@@ -123,11 +123,14 @@ export async function deleteRecipe(recipeId : number) : Promise<ServerActionResp
 // TODO: clean up these parameters
 export async function updateRecipe({ id, creatorId, name, instructions, videoFile, imageFile, ingredients} ) : Promise<ServerActionResponse<Recipe>>{
     // verify caller has permission to delete this recipe
-    const errorReason = await checkCanModifyRecipe(id);
-    if(errorReason !== null){
-        return intoError(errorReason);
+    // if id is undefined then it means we're making a new recipe
+    if(id != undefined){
+        const errorReason = await checkCanModifyRecipe(id);
+        if(errorReason !== null){
+            return intoError(errorReason);
+        }
     }
-
+    
     if(name.trim() != name || name.trim() == ""){
         return intoError("Recipe name cannot be empty or contain whitespace at the start or end");
     }
