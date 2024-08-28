@@ -36,7 +36,7 @@ function Signup() {
                         return data.message;
                     }
                 },
-            }).then(() => signIn(null, {redirect: true, callbackUrl: "/account"}));
+            }).then(() => signIn('credentials', {redirect: true}));
         }catch{}
     }
     return ( 

@@ -5,6 +5,7 @@ const nextConfig = {
             allowedOrigins: [],
         }
     },
+    output: "standalone"
 };
 
 export default nextConfig;

@@ -1,0 +1,25 @@
+volumes: 
+  data:
+services:
+  server:
+    build: .
+    restart: unless-stopped
+#    environment:
+#      - php.file_uploads=On
+#      - php.upload_max_filesize=10G
+#      - php.post_max_size=10G
+    environment:
+      # this needs to be specified here because the file structure in the
+      # container does not align with the dev environment
+      - DATABASE_URL=file:/app/data/database.db
+      # this is needed so that nextAuth doesn't send the
+      # user to a bad port or internal address. Very 
+      # sub-optimal and annoying, tbh
+      - NEXTAUTH_URL=http://foodfetcher.fufufuzz.cc:3000
+      #- HOSTNAME=foodfetcher.fufufuzz.cc
+      #- NETWORK=0.0.0.0
+    ports:
+      - '3000:3000'
+    volumes:
+      - "data:/app/data/"
+      - "./.env.local:/app/.env.local"

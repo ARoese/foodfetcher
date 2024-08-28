@@ -87,7 +87,7 @@ function aggregateConvertible(ingredients : IngredientEntry[]) : IngredientEntry
     // group by set of possible destination conversions
     // this separates ingredients by volume vs length vs mass, etc
     const measureGroups = Object.groupBy(ingredients, 
-        // @ts-ignore
+        // @ts-ignore We know this is going to be a valid conversion
         (ingredient) => convert().describe(ingredient.measureSymbol).measure
     );
 
