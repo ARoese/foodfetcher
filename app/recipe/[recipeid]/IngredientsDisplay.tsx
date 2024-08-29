@@ -17,6 +17,7 @@ function IngredientsDisplay({ingredients, setIngredients, beingEdited, preferred
                 id: null,
                 ingredientName: "new ingredient",
                 measureSymbol: null,
+                recipeId: undefined,
                 amount: 0,
                 amount2: null,
                 sortIndex: ingredients.length,

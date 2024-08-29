@@ -99,6 +99,7 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
             newDynPlans[targetPlanIndex].days[targetDayIndex].quantRecipes[numQRecipesInDay] = {
                 id: -numQRecipesInDay,
                 quantity: 1,
+                planDayId: newDynPlans[targetPlanIndex].days[targetDayIndex].id,
                 recipeId: active.data.current.id,
                 recipe: active.data.current
             };

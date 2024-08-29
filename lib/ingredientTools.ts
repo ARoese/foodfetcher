@@ -47,8 +47,8 @@ export function parsedIngredientToIngredientEntry(ingredient : ParsedIngredient,
     };
     return (
         dbSource != null
-        ? {...generic, id: dbSource.id, sortIndex: dbSource.sortIndex }
-        : {...generic, id: null, sortIndex: null}
+        ? {...generic, recipeId: dbSource.recipeId, id: dbSource.id, sortIndex: dbSource.sortIndex }
+        : {...generic, recipeId: null, id: null, sortIndex: null}
     );
 }
 

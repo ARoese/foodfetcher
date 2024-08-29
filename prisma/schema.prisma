@@ -38,7 +38,8 @@ model Recipe {
 
 model IngredientEntry {
   id             Int        @id @default(autoincrement())
-  recipes        Recipe[]
+  recipeId       Int
+  recipe         Recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   ingredient     Ingredient @relation(fields: [ingredientName], references: [name])
   ingredientName String
   measureSymbol  String?
@@ -74,11 +75,12 @@ model PlanDay {
 }
 
 model RecipeQuantity {
-  id       Int       @id @default(autoincrement())
-  quantity Int
-  recipeId Int
-  recipe   Recipe    @relation(fields: [recipeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  inDays   PlanDay[]
+  id        Int     @id @default(autoincrement())
+  quantity  Int
+  recipeId  Int
+  recipe    Recipe  @relation(fields: [recipeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  planDayId Int
+  planDay   PlanDay @relation(fields: [planDayId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 // Enum of SSMTWTF
