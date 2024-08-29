@@ -1,5 +1,5 @@
 import { Ingredient, IngredientEntry } from "@prisma/client";
-import { Ingredient as ParsedIngredient, parseIngredient } from "parse-ingredient";
+import { Ingredient as ParsedIngredient, parseIngredient, UnitOfMeasureDefinitions } from "parse-ingredient";
 
 /** words that should never be interpreted to be units of measure */ 
 const falseUOMs = [
@@ -9,10 +9,20 @@ const falseUOMs = [
     "humongous"
 ]
 
+/** additional units of measure that should reasonably be included */
+const additionalUOMs : UnitOfMeasureDefinitions = {
+    "liter" : {
+        alternates: ["l", "L", "Liter", "liter", "ltr", "Ltr"],
+        plural: "liters",
+        short: "l"
+    }
+}
+
 export function tryParseIngredient(ingredientText : string) : {valid: boolean, parsed: ParsedIngredient}
 {
     const parsed = parseIngredient(ingredientText, {
-        ignoreUOMs: falseUOMs
+        ignoreUOMs: falseUOMs,
+        additionalUOMs: additionalUOMs
     });
     return {
          valid: parsed.length == 1 && isParsedIngredientValid(parsed[0]),
