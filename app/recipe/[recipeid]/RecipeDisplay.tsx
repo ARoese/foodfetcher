@@ -201,7 +201,7 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorite
                             onChange={(e) => setDynRecipe({...dynRecipe, instructions: e.target.value})}
                             placeholder="Instructions on how to make your recipe"
                             />
-                        : <p>{dynRecipe.instructions}</p>
+                        : <p className="whitespace-pre-wrap">{dynRecipe.instructions}</p>
                     }
                 </div>
             </div>
