@@ -2,13 +2,11 @@
 
 import { toast } from "react-toastify";
 import SmallPageContainer from "../components/SmallPageContainer";
-// @ts-ignore This module does actually exist, and behaves as such. Intellisense is wrong.
 import { createUser } from "@/lib/db/user";
-import { signIn } from "next-auth/react";
-// @ts-ignore This module does actually exist, and behaves as such. Intellisense is wrong.
-import { ActionResult, isLeft } from "@/lib/actions";
-
+import { useRouter } from "next/navigation";
+import wrappedAction from "@/lib/wrappedAction";
 function Signup() {
+    const router = useRouter();
     async function submitAction(data : FormData) {
         const [username, password, passwordConfirm] = 
             [data.get("username"), data.get("password"), data.get("passwordconfirm")].map((e) => e.toString());
@@ -25,7 +23,7 @@ function Signup() {
             return;
         }
 
-        const createUserPromise = createUser(username, password);
+        const createUserPromise = wrappedAction(createUser(username, password));
         try{
             await toast.promise(createUserPromise, {
                 pending: "Creating user",
@@ -36,7 +34,7 @@ function Signup() {
                         return data.message;
                     }
                 },
-            }).then(() => signIn('credentials', {redirect: true}));
+            }).then(() => router.push("/api/auth/signin"));
         }catch{}
     }
     return ( 
