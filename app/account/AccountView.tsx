@@ -13,16 +13,16 @@ function AccountView({account} : {account : SafeUser}) {
     const [changingPassword, setChangingPassword] = useState(false);
     const [userName, setUserName] = useState(account.name);
     const [preferredSystem, setPreferredSystem] = useState(account.preferredMeasureSystem);
-    //console.log(preferredSystem);
+
 
     async function doSave(e){
         if(!confirm("Are you sure you want to update your profile?")){
             return;
         }
 
-        //console.log(e);
+
         const formProps = Object.fromEntries(e);
-        //console.log(formProps);
+
         const newUser = userName;
         const currentPass = formProps.currentPass;
         const newPass = formProps.newPass;
@@ -38,7 +38,7 @@ function AccountView({account} : {account : SafeUser}) {
                 pending: "Updating your account information...",
                 error: {
                     render({data} : {data: Error}){
-                        //console.log(data);
+
                         return data.message;
                     }
                 },

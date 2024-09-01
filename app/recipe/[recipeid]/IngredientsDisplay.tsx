@@ -41,8 +41,8 @@ function IngredientsDisplay({ingredients, setIngredients, beingEdited, preferred
                             // a new closure using the index above to specify what ingredient
                             // to modify that the caller doesn't need to know about
                             (newIngredient : IngredientEntry|null) : void => {
-                                //console.log(`updating ${i}`);
-                                //console.log(newIngredient);
+
+
                                 setIngredients(
                                     newIngredient === null
                                     ? [...ingredients].toSpliced(i, 1)

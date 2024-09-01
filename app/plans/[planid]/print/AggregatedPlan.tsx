@@ -8,11 +8,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 
 function AggregatedPlan({plan, preferredSystem} : {plan : FullPlan, preferredSystem : "imperial" | "metric"}) {
-    console.log(preferredSystem);
+
     const aggregatedDays : IngredientEntry[] = aggregateDays(plan.days);
-    console.log(aggregatedDays);
+
     const bestUnits : IngredientEntry[] = aggregatedDays.map((i) => toBestUnit(i, preferredSystem));
-    console.log(bestUnits);
+
     const aggregatedText = bestUnits.map(toIngredientTextGroups).map(({full}) => full);
     return ( 
         <>

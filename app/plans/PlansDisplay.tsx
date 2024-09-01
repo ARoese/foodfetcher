@@ -31,7 +31,7 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
         setPlanIndex(dynPlansOptions.length != 0 ? dynPlansOptions[0] : null);
     }
     const [draggingRecipe, setDraggingRecipe] = useState(null);
-    //console.log(favorites, ownRecipes);
+
 
     
     async function addPlan(name : string){
@@ -84,7 +84,7 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
         if(!over){
             return;
         }
-        console.log(active, over);
+
         const [planId, dayName] = over.id.split(" ");
         const targetPlanIndex = dynPlans.findIndex((plan) => plan.id == +planId);
         const targetDayIndex = dynPlans[targetPlanIndex].days.findIndex((day) => day.dayName == dayName);
@@ -134,7 +134,7 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
                 error: {
                     render: (e) => {
                         const error = e.data as Error;
-                        console.log(e);
+
                         return `Failed to save plans: ${error.message}`;
                     }
                 },
@@ -143,7 +143,7 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
         }catch{}
     }
 
-    //console.log(draggingRecipe);
+
 
     return ( 
         <DndContext autoScroll={false}

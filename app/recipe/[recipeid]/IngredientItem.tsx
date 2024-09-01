@@ -34,7 +34,7 @@ function IngredientItem({ingredient, beingEdited, preferredSystem, setIngredient
     const {amount, symbol, name, full: ingredientText} = toIngredientTextGroups(ingredient);
     // convert it to preferred units for non-editing display text
     const {full: bestIngredientText} = toIngredientTextGroups(toBestUnit(ingredient, preferredSystem));
-    console.log(bestIngredientText);
+
     // default text state to go to when state is invalid (not initialized or prop change)
     const defaultDynIngredientState = {
         valid: tryParseIngredient(ingredientText).valid,
@@ -65,7 +65,7 @@ function IngredientItem({ingredient, beingEdited, preferredSystem, setIngredient
         let {valid, parsed} = tryParseIngredient(text);
 
         if(valid){
-            //console.log(parsed);
+
             setIngredient(parsedIngredientToIngredientEntry(parsed, ingredient));
         }else{
             setDynIngredient({

@@ -156,7 +156,7 @@ export async function getMealPlans() : Promise<ServerActionResponse<DeepPlan[]>>
 
     user.plans.forEach(sortPlanDays);
     
-    console.log(user);
+
     return intoResult(user.plans);
 }
 

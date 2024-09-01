@@ -24,7 +24,7 @@ function RecipeSearchForm() {
             .then((data) => setDisplay(data))
     }, [page]);
 
-    //console.log(display);
+
 
     const onClickSearch : MouseEventHandler<HTMLButtonElement> = async (e) => {
         e.preventDefault();

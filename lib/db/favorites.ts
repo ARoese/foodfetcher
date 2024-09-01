@@ -46,7 +46,7 @@ export async function hasFavorited(recipeId : number) : Promise<ServerActionResp
             }
         }
     });
-    console.log(favoritesCount);
+
 
     return intoResult(favoritesCount._count.favorites > 0);
 }

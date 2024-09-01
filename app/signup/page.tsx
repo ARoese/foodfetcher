@@ -30,7 +30,7 @@ function Signup() {
                 success: "User created",
                 error: {
                     render({data} : {data: Error}){
-                        console.log(data);
+
                         return data.message;
                     }
                 },

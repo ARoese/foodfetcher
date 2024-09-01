@@ -7,11 +7,11 @@ import { ChangeEventHandler } from "react";
 export type DeepPlanDay = DeepPlan["days"][number];
 type args = {plan : DeepPlan, editing : boolean, setPlan : (plan : DeepPlan) => void}
 function Plan({plan, setPlan, editing} : args) {
-    //console.log(plan);
+
     // TODO: may need to add a prop-based refresh here
     function makeSetDay(i : number) : (day : DeepPlanDay) => void {
         return (day : DeepPlanDay) => {
-            //console.log(`setting day ${i}`, day);
+
             setPlan({
                 ...plan,
                 // get a little deep here, but change the days 

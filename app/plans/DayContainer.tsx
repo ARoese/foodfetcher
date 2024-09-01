@@ -20,7 +20,7 @@ function DayContainer({day, setDay, editing} : args) {
 
     function makeDecRecipe(i : number) {
         return () => {
-            //console.log(`Deleting recipe ${i}`);
+
             // delete the quantRecipe if it would go to 0
             // otherwise, decrement the count
             const newDay = day.quantRecipes[i].quantity <= 1 
@@ -41,7 +41,7 @@ function DayContainer({day, setDay, editing} : args) {
 
     function makeIncRecipe(i : number) {
         return () => {
-            //console.log(`Deleting recipe ${i}`);
+
             // delete the quantRecipe if it would go to 0
             // otherwise, decrement the count
             const newDay = {

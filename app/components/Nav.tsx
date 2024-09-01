@@ -9,7 +9,7 @@ export default async function Nav(){
     const session = await auth();
     const isLoggedIn = Boolean(session);
     const log = isLoggedIn ? "Logout" : "Login";
-    //console.log(session);
+
     return (
         <>
             <nav className="flex flex-row h-full text-center overflow-x-scroll bg-white px-2">

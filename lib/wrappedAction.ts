@@ -5,7 +5,7 @@ export default async function wrappedAction<T>(actionPromise : Promise<ServerAct
     if(res == undefined){
         return undefined;
     }
-    //console.log(res);
+
     if(res.result !== undefined){ 
         return res.result; // if it is a good result, return it
     }else{

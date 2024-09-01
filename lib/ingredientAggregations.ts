@@ -165,10 +165,10 @@ const undesirableUnits = [
 ]
 
 export function toBestUnit(ingredient : IngredientEntry, system : "imperial" | "metric" = "imperial"){
-    console.log(ingredient);
+
     const fixedSymbol = fixUnit(ingredient.measureSymbol);
     if(!isconvertible(fixedSymbol)){
-        console.log(ingredient.measureSymbol)
+
         return ingredient;
     }
     

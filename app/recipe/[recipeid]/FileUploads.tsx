@@ -15,7 +15,7 @@ type args = {
 function FileUploads({beingEdited, imageFile, videoFile, setImageFile, setVideoFile} : args) {
     // TODO: verify file types
     async function handleImageUpload(file : File){
-        console.log(file);
+
         const d = new FormData();
         d.append("image", file);
         const remoteName = await setMedia(file.name, "image", d);
@@ -23,7 +23,7 @@ function FileUploads({beingEdited, imageFile, videoFile, setImageFile, setVideoF
     }
 
     async function handleVideoUpload(file : File){
-        console.log(file);
+
         const d = new FormData();
         d.append("video", file);
         const remoteName = await setMedia(file.name, "video", d);

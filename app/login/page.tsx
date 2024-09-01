@@ -12,12 +12,12 @@ export default async function SignIn(){
 
     async function doLogin(formData) {
         "use server";
-        console.log(formData);
+
         await signIn("credentials", formData);
     };
 
     //const session = await auth();
-    //console.log(session);
+
 
     return (
         <div id = "Content" style={{width: "320px"}}>

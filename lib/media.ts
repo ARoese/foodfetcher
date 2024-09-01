@@ -30,8 +30,8 @@ export async function mediaExists(name : string, type : "video" | "image") : Pro
 
 export async function getMedia(name : string, type : "video" | "image" ) : Promise<ReadStream | null> {
     const checkPath = fullPath(name, type);
-    console.log(__dirname);
-    console.log(checkPath);
+
+
     return fs.existsSync(checkPath) ? fs.createReadStream(checkPath) : null;
 }
 

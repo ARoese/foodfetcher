@@ -70,7 +70,7 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorite
                         error: {
                             render: (e) => {
                                 const error = e.data as Error;
-                                console.log(e);
+
                                 return `Failed to save recipe: ${error.message}`;
                             }
                         },

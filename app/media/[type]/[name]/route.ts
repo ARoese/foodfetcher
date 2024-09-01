@@ -21,7 +21,7 @@ function streamFile(file: ReadStream, options?: ReadableOptions): ReadableStream
 const response404 = new Response("Not Found", {status: 404});
 
 export async function GET(request : Request, { params } : {params: {type : "video" | "image", name : string}}){
-    console.log(params);
+
     const {type, name} = params;
     const defaultLogoPath = new URL("/images/logo.png", request.url);
     
@@ -30,7 +30,7 @@ export async function GET(request : Request, { params } : {params: {type : "vide
     }
     
     const fileStream = await getMedia(name, type);
-    //console.log(fileStream);
+
     if(fileStream == null){
         return type == "image" 
             ? NextResponse.redirect(defaultLogoPath) 
