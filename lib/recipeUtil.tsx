@@ -6,6 +6,6 @@ import Image from "next/image";
 export default function recipeImageJsx(imageFile : string|null){
     return imageFile
         // eslint-disable-next-line @next/next/no-img-element
-        ? <img src={`/media/image/${imageFile}`} alt="Recipe cover image"/>
+        ? <img width="100%" height="100%" src={`/media/image/${imageFile}`} alt="Recipe cover image"/>
         : <Image width="0" height="0" src={recipeImage} alt="Recipe cover image"/>
 }
