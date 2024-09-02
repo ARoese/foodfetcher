@@ -31,7 +31,7 @@ export default async function Nav(){
                     ) : (
                         <>  
                         <NavLink login={true} href="">Login</NavLink>
-                        <NavLink href="signup">Sign Up</NavLink>
+                        <NavLink href="/signup">Sign Up</NavLink>
                         </>
                     )
                 }
