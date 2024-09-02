@@ -4,6 +4,8 @@ import { getMedia } from "@/lib/media";
 import { ReadStream } from "fs";
 import { ReadableOptions } from "stream";
 
+export const dynamic = 'force-static';
+
 // https://github.com/vercel/next.js/discussions/15453#discussioncomment-6748645
 function streamFile(file: ReadStream, options?: ReadableOptions): ReadableStream<Uint8Array> {
     return new ReadableStream({
