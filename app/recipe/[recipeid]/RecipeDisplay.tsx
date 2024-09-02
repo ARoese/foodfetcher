@@ -157,8 +157,8 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorite
         }
         <h2>{dynRecipe.creator.name}</h2>
         <h2>{dynRecipe.updatedAt ? dynRecipe.updatedAt.toISOString() : ""}</h2>
-        <div className="flex flex-row">
-            <div className="max-w-2/5 h-fit">
+        <div className="flex flex-col md:flex-row">
+            <div className="max-w-2/5 h-fit mb-6 md:mb-0">
                 <FileUploads 
                     beingEdited={beingEdited}
                     imageFile={dynRecipe.imageFile}
@@ -195,7 +195,7 @@ function RecipeDisplay({recipe, creatingNew = false, canEdit = false, isFavorite
                         ? <ReactTextareaAutosize
                             minRows={4}
                             style={{width: "100%"}}
-                            className="box-border"
+                            className="box-border ml-1"
                             wrap="soft"
                             value={dynRecipe.instructions} 
                             onChange={(e) => setDynRecipe({...dynRecipe, instructions: e.target.value})}

@@ -104,9 +104,9 @@ function IngredientItem({ingredient, beingEdited, preferredSystem, setIngredient
                         hasFocus
                         ? (
                             <>
-                            <p className="text-blue-800 whitespace-nowrap mx-0.5 my-auto">{amount}</p>
-                            <p className="text-amber-800 whitespace-nowrap mx-0.5 my-auto">{symbol}</p>
-                            <p className="text-fuchsia-800 whitespace-nowrap mx-0.5 my-auto">{name}</p>
+                            <p className="text-blue-800 max-lg:hidden whitespace-nowrap mx-0.5 my-auto">{amount}</p>
+                            <p className="text-amber-800 max-lg:hidden whitespace-nowrap mx-0.5 my-auto">{symbol}</p>
+                            <p className="text-fuchsia-800 max-lg:hidden whitespace-nowrap mx-0.5 my-auto">{name}</p>
                             </>
                         )
                         : ""

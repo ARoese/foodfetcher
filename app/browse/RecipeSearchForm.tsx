@@ -38,20 +38,20 @@ function RecipeSearchForm() {
     return ( 
         <>
         <h1>Search Recipes</h1>
-        <div className="flex flex-row">
-            <div className="relative">
+        <div className="flex flex-col md:flex-row">
+            <div className="relative min-w-60 mb-6">
                 <form className="sticky top-4 flex flex-col mr-4">
                     <label>
-                        Recipe Name:
-                        <input type="text" placeholder="steamed hams" value={searchName} onChange={(e) => setSearchName(e.target.value)}/>
+                        Recipe Name:<br/>
+                        <input className="w-full" type="text" placeholder="steamed hams" value={searchName} onChange={(e) => setSearchName(e.target.value)}/>
                     </label>
                     <label>
-                        Author:
-                        <input type="text" placeholder="John Smith" value={searchAuthor} onChange={(e) => setSearchAuthor(e.target.value)}/>
+                        Author:<br/>
+                        <input className="w-full" type="text" placeholder="John Smith" value={searchAuthor} onChange={(e) => setSearchAuthor(e.target.value)}/>
                     </label>
                     <label>
-                        Keywords:
-                        <input type="text" placeholder="walnuts, ice cream, sugar" value={searchKeywords} onChange={(e) => setSearchKeywords(e.target.value)}/>
+                        Keywords:<br/>
+                        <input className="w-full" type="text" placeholder="walnuts, sugar, milk" value={searchKeywords} onChange={(e) => setSearchKeywords(e.target.value)}/>
                     </label>
                     <button onClick={onClickSearch}>Search</button>
                 </form>
