@@ -15,7 +15,7 @@ export default async function Nav(){
             <nav 
                 className="flex flex-row 
                         h-20 text-center overflow-x-scroll bg-white px-2">
-                <Link href="/" className="mr-auto">
+                <Link href="/" className="mr-auto max-sm:hidden">
                     <Image priority={true} src={logoDark} className="h-20 w-auto" alt="Food Fetcher Logo" />
                 </Link>
                 <NavLink href="/">Home</NavLink>
