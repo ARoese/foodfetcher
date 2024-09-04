@@ -11,7 +11,7 @@ services:
       # this is needed so that nextAuth doesn't send the
       # user to a bad port or internal address. Very 
       # sub-optimal and annoying, tbh
-      - NEXTAUTH_URL=https://foodfetcher.fufufuzz.cc:54432
+      - NEXTAUTH_URL=https://foodfetcher.fufufuzz.cc
       - NEXTAUTH_URL_INTERNAL=http://localhost:3000
       #- HOSTNAME=foodfetcher.fufufuzz.cc
       #- NETWORK=0.0.0.0
