@@ -15,7 +15,7 @@ export function intoError(reason: string) : ServerActionError {
     return {error: reason}; 
 }
 
-export function intoResult<T>(result: T){
+export function intoResult<T>(result: T) : ServerActionResult<T>{
     return {result};
 }
 

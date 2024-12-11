@@ -18,6 +18,7 @@
     "@types/convert-units": "^2.3.9",
     "convert-units": "^3.0.0-beta.6",
     "deep-equal": "^2.2.3",
+    "file-type": "^19.6.0",
     "next": "14.2.5",
     "next-auth": "^5.0.0-beta.20",
     "parse-ingredient": "^1.2.1",
