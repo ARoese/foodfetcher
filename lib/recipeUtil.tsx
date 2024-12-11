@@ -2,7 +2,7 @@
 import recipeImage from "@/public/images/logo.png";
 import Image from "next/image";
 
-//** turns a nullable image name into the img or Image element that should display it */
+/** turns a nullable image name into the img or Image element that should display it */
 export default function recipeImageJsx(imageFile : string|null){
     return imageFile
         // eslint-disable-next-line @next/next/no-img-element

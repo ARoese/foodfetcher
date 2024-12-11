@@ -47,7 +47,7 @@ function isconvertible(measure : string) : boolean{
     }
 }
 
-//** Requires that the conversion is valid  */
+/** Requires that the conversion is valid  */
 export function convertIngredientTo(ingredient : IngredientEntry, unit : string) : IngredientEntry{
     const ingredientCopy = {...ingredient};
     const fixedSymbol = fixUnit(ingredient.measureSymbol);
@@ -82,7 +82,7 @@ function combineIngredients(ingredient1 : IngredientEntry, ingredient2 : Ingredi
     return newIngredient;
 }
 
-//** Aggregate ingredients whose units are compatible with convert-units */
+/** Aggregate ingredients whose units are compatible with convert-units */
 function aggregateConvertible(ingredients : IngredientEntry[]) : IngredientEntry[] {
     // group by set of possible destination conversions
     // this separates ingredients by volume vs length vs mass, etc
@@ -98,7 +98,7 @@ function aggregateConvertible(ingredients : IngredientEntry[]) : IngredientEntry
     );
 }
 
-//** Aggregate ingredients whose units are not compatible with convert-units */
+/** Aggregate ingredients whose units are not compatible with convert-units */
 function aggregateUnconvertible(ingredients : IngredientEntry[]) : IngredientEntry[] {
     const measureGroups = Object.groupBy(ingredients,
         (ingredient) => ingredient.measureSymbol ?? "null"
