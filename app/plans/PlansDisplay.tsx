@@ -179,9 +179,14 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
                 ? <button className="text-red-700 absolute right-0" onClick={async () => await deletePlan(planIndex.value)}>Delete</button>
                 : (
                     planIndex &&
-                    <Link href={`/plans/${dynPlans[planIndex.value].id}/print`}>
-                        <button className="absolute right-0">Collect Ingredients</button>
-                    </Link>
+                    <div className="flex flex-row absolute right-0">
+                        <Link className="mr-1" href={`/plans/${dynPlans[planIndex.value].id}/ingredientsList/all`}>
+                            <button>Ingredients</button>
+                        </Link>
+                        <Link href={`/plans/${dynPlans[planIndex.value].id}/ingredientsList/byDay`}>
+                            <button>Ingredients by Day</button>
+                        </Link>
+                    </div>
                 )
             }
         </div>

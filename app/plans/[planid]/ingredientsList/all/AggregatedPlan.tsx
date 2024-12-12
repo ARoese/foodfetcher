@@ -1,5 +1,5 @@
 import { FullPlan } from "@/lib/db/plans";
-import { aggregateDays, toBestUnit } from "../../../../lib/ingredientAggregations";
+import { aggregateDays, toBestUnit } from "../../../../../lib/ingredientAggregations";
 import { IngredientEntry } from "@prisma/client";
 import IngredientsDisplay from "@/app/recipe/[recipeid]/IngredientsDisplay";
 import { toIngredientTextGroups } from "@/lib/ingredientTools";
@@ -8,7 +8,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 
 function AggregatedPlan({plan, preferredSystem} : {plan : FullPlan, preferredSystem : "imperial" | "metric"}) {
-
     const aggregatedDays : IngredientEntry[] = aggregateDays(plan.days);
 
     const bestUnits : IngredientEntry[] = aggregatedDays.map((i) => toBestUnit(i, preferredSystem));

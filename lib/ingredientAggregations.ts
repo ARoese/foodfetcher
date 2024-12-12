@@ -3,7 +3,7 @@ import configureMeasurements from "convert-units"
 import allMeasures from "convert-units/definitions/all"
 const convert = configureMeasurements(allMeasures);
 import type { IngredientEntry } from "@prisma/client";
-type FullDay = FullPlan["days"][number];
+export type FullDay = FullPlan["days"][number];
 type FullQuantRecipe = FullDay["quantRecipes"][number];
 
 // https://stackoverflow.com/a/42299191
