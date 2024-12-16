@@ -8,7 +8,11 @@ directly modifying the database using prisma studio. I will change this later by
 and admin accounts.
 
 setup:
+
 `npx auth` -- generate your own an auth secret
-`npx prisma db push` -- generate a new prisma db. The DB file will be in the untracked `data` diretory
+
+`npx prisma db push` -- generate a new prisma db. The DB file will be in the untracked `data` directory
+
 `npx prisma db seed -- --fake` -- (optional) seed the prisma db with test data
+
 `npx next dev` -- run a typical next dev server
