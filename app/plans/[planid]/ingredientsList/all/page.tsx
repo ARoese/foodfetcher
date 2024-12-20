@@ -3,7 +3,7 @@ import { getMealPlan } from "@/lib/db/plans";
 import { notFound, redirect } from "next/navigation";
 import AggregatedPlan from "./AggregatedPlan";
 import { getCurrentUserOrLogin } from "@/lib/db/user";
-import wrappedAction from "@/lib/wrappedAction-server";
+import wrappedAction from "@/lib/wrappedAction";
 
 async function PrintPlan({params: {planid}} : {params: {planid : string}}) {
     const parsedPlanId = parseInt(planid);

@@ -5,7 +5,7 @@ import { Metadata } from "next";
 import RecipeDisplay from "./RecipeDisplay";
 import { hasFavorited } from "@/lib/db/favorites";
 import { getCurrentUser, getCurrentUserOrLogin } from "@/lib/db/user";
-import wrappedAction from "@/lib/wrappedAction-server";
+import wrappedAction from "@/lib/wrappedAction";
 
 const prisma = new PrismaClient();
 

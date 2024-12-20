@@ -7,7 +7,7 @@ import { getFavorites } from "@/lib/db/favorites";
 import { getMealPlans } from "@/lib/db/plans";
 import { getOwnRecipes } from "@/lib/db/recipes";
 import { redirect } from "next/navigation";
-import wrappedAction from "@/lib/wrappedAction-server";
+import wrappedAction from "@/lib/wrappedAction";
 
 export async function generateMetadata() {
     return {

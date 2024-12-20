@@ -1,4 +1,3 @@
-"use client";
 import type {ServerActionResponse} from "./actions"
 export default async function wrappedAction<T>(actionPromise : Promise<ServerActionResponse<T>>) : Promise<T> {
     const res = await actionPromise;
