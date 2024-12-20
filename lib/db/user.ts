@@ -7,6 +7,7 @@ import { auth, createPassword, verifyPasswordAgainstDB } from "@/auth";
 import { PrismaClient, User } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { intoError, intoResult, ServerActionResponse } from "../actions";
+import { setTimeout } from "timers/promises";
 
 const prisma = new PrismaClient();
 
@@ -45,6 +46,27 @@ export async function createUser(username : string, password : string) : Promise
             passhash: await createPassword(password)
         }
     });
+}
+
+export async function deleteUser(id: number) : Promise<ServerActionResponse<void>> {
+    const currentUser = await getCurrentUser();
+    if(currentUser == null){
+        return intoError("You are not logged in");
+    }
+
+    if(!(currentUser.admin || currentUser.id == id)){
+        return intoError("You do not have permission to do this.");
+    }
+
+    const deleteResult = await prisma.user.deleteMany({
+        where: {id: id}
+    });
+
+    if(deleteResult.count == 0){
+        return intoError("User not found");
+    }
+
+    return intoResult(null);
 }
 
 export async function updateUser(
@@ -119,4 +141,49 @@ export async function getCurrentUser() : Promise<SafeUser | null> {
             passhash: true
         }
     });
+}
+
+export async function getAllAdmins() : Promise<SafeUser[]> {
+    const allAdminUsers = await prisma.user.findMany({
+        where: {
+            admin: true
+        },
+        omit: {
+            passhash: true
+        }
+    });
+
+    return allAdminUsers;
+}
+
+export async function setAdminStatus(id : number, newStatus : boolean) : Promise<ServerActionResponse<void>>{
+    const currentUser = await getCurrentUser();
+    if(!currentUser?.admin){
+        return intoError("You do not have permission to do this.");
+    }
+
+    const updateResult = await prisma.user.updateMany({
+        where: {id: id},
+        data: {admin: newStatus}
+    });
+
+    if(updateResult.count == 0){
+        return intoError("Failed to update the user. User with id not found.");
+    }
+
+    return intoResult(null);
+}
+
+export async function getUsersLikeName(name : string, limit : number) : Promise<SafeUser[]> {
+    const allUsersLike = await prisma.user.findMany({
+        where: {
+            name: {contains: name}
+        },
+        omit: {
+            passhash: true
+        },
+        take: limit > 0 ? limit : undefined
+    });
+
+    return allUsersLike;
 }

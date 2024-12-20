@@ -100,7 +100,11 @@ async function checkCanModifyRecipe(recipeId : number) : Promise<string | null>{
     }else if(recipe === null){
         return "Recipe does not exist";
     }else if(+session.user.id != recipe.creatorId){
-        return "You do not own this recipe";
+        // see if this is an admin and override this check if they are
+        const userFromDB = await prisma.user.findUnique({where: {id: +session.user.id}});
+        if(!userFromDB.admin){
+            return "You do not own this recipe";
+        }
     }
 
     return null;

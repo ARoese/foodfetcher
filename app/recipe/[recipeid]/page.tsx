@@ -101,7 +101,7 @@ async function RecipeDisplayPage({params: {recipeid}}) {
         notFound();
     }
 
-    const canEdit = creating || currentUser !== null && recipe.creatorId == currentUser.id;
+    const canEdit = creating || currentUser?.admin || currentUser !== null && recipe.creatorId == currentUser.id;
     const isFavorited = recipe.id ? await wrappedAction(hasFavorited(recipe.id)) : false;
     const preferredSystem = currentUser?.preferredMeasureSystem ?? "imperial";
     return ( 

@@ -69,6 +69,14 @@ async function addFakeData(){
             }
     });
 
+    const moreFakeUsers = await prisma.user.createMany({
+        data: [...Array(10).keys()].map(
+            (i) => ({
+                name: `testUser${i+1}`,
+            })
+        )
+    });
+
     for (const num in [...Array(10).keys()]){
         await prisma.recipe.create({
             data: {
@@ -93,8 +101,31 @@ async function addFakeData(){
     }
 }
 
+async function addAdmin(){
+    // generate a random password for the admin account.
+    // TODO: this is for later, when I can actually import my crypto functions
+    // for making a password hash and use them in here
+    const defaultAdminPassword : string = 
+        [...Array(16).keys()]
+            .map(_ => Math.floor(Math.random()*26))
+            .map(code => String.fromCharCode(code))
+            .map(char => Math.random() > 0.5 ? char.toUpperCase() : char)
+            .join();
+
+    const admin = await prisma.user.create({
+        data:
+            {
+                name: "admin",
+                admin: true
+            }
+    });
+
+    console.log("YOU SHOULD NOT USE THIS DATABASE IN PRODUCTION!");
+    console.log("The admin account 'admin' can be logged into with any password!");
+}
+
 async function main(){
-    const {values: {fake}} = parseArgs({
+    const {values: {fake, admin}} = parseArgs({
         args: process.argv,
         options: {
             fake: {
@@ -102,6 +133,11 @@ async function main(){
                 short: "f",
                 default: false
             },
+            admin: {
+                type: "boolean",
+                short: "a",
+                defult: false
+            }
         },
         allowPositionals: true
     });
@@ -110,10 +146,15 @@ async function main(){
 
     if(fake){
         console.log("Creating fake data");
-        addIngredients();
-        addFakeData();
+        await addIngredients();
+        await addFakeData();
     }else{
         console.log("Not creating fake data. Pass -f or --fake to generate fake recipes and dev users");
+    }
+
+    if(admin){
+        console.log("Creating a default admin account");
+        await addAdmin();
     }
 }
 

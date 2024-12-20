@@ -18,6 +18,7 @@ model User {
   recipes                Recipe[] @relation(name: "creator")
   favorites              Recipe[] @relation(name: "favoritedBy")
   plans                  Plan[]
+  admin                  Boolean  @default(false)
   preferredMeasureSystem String   @default("imperial")
 }
 
