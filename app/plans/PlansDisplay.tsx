@@ -35,10 +35,6 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
 
     
     async function addPlan(name : string){
-        // this makes a new plan in the database
-        // eagerly--it doesn't wait for everything to be done
-        // before making the push to db
-        // clicking the plus = new plan exists in DB
         setDynPlans(
             [
                 ...dynPlans, 
@@ -165,6 +161,7 @@ function PlansDisplay({plans, userId, favorites, ownRecipes} : args) {
                 value={planIndex}
                 className="w-fit min-w-64 mx-auto" 
                 options={dynPlansOptions}
+                placeholder="Select a plan, or type to create..."
                 onCreateOption={async (n) => {
                     await addPlan(n);
                     setEditing(true);
