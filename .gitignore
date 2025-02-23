@@ -35,6 +35,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# prisma db state and migrations
+# prisma db state
 data/*
-prisma/migrations/*

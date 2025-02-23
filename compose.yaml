@@ -18,5 +18,5 @@ services:
     #ports:
     #  - '3000:3000'
     volumes:
-      - "foodfetcher-data:/app/data/"
+      - "./data/:/app/data/"
       - "./.env.local:/app/.env.local:ro"

@@ -29,9 +29,9 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN rm -r ./data
 RUN npx prisma generate
-RUN npx prisma migrate dev
+# fails if there are pending migrations that would need to be applied
+RUN npx prisma migrate status
 
 RUN \
   if [ -f yarn.lock ]; then yarn run build; \
